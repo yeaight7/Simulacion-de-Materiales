@@ -4,7 +4,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
-\usepackage[spanish]{babel}
+\usepackage[english]{babel}
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
 \usepackage{booktabs}
@@ -51,8 +51,8 @@
     breakatwhitespace=false
 }
 
-\title{\textbf{Trabajo de Curso -- Simulación de Materiales}}
-\author{Javier Rivero Iglesias} % TODO: Añadir nombre del autor
+\title{\huge{\textbf{Trabajo de Curso \\ Simulación de Materiales}}}
+\author{\huge{Javier Rivero Iglesias}}
 \date{}
 
 \begin{document}
@@ -60,6 +60,7 @@
 \maketitle
 \thispagestyle{empty}
 
+\newpage
 \tableofcontents
 \newpage
 
@@ -160,6 +161,7 @@ Sección & Área $A$ [m$^2$] & Momento de inercia $I$ [m$^4$] \\
 \caption{Propiedades geométricas de las secciones.}
 \end{table}
 
+\newpage
 \section{Fundamentos Teóricos}
 
 \subsection{Método de Elementos Finitos}
@@ -276,6 +278,7 @@ Las reacciones en los apoyos se calculan como:
 \mathbf{p}_p = \mathbf{S}_{pp} \mathbf{d}_p + \mathbf{S}_{pd} \mathbf{d}_d
 \end{equation}
 
+\newpage
 \section{Implementación Computacional}
 
 \subsection{Arquitectura del Programa}
@@ -376,6 +379,7 @@ Postprocesamiento completado
 
 Esta salida confirma que todos los módulos se ejecutan secuencialmente sin errores, validando la correcta implementación del programa.
 
+\newpage
 \section{Desarrollo de los Apartados del Enunciado}
 
 En esta sección se responde de forma directa y estructurada a los apartados planteados en el enunciado del trabajo.
@@ -588,6 +592,7 @@ Nodo & $R_x$ [N] & $R_y$ [N] & $M$ [N·m] \\
     \item $\sum M \approx 0$ \(\checkmark\) (equilibrio de momentos)
 \end{itemize}
 
+\newpage
 \section{Análisis Comparativo}
 
 \subsection{Comparación de Desplazamientos}
@@ -630,6 +635,7 @@ La barra crítica (48) es la misma en ambos modelos y corresponde a un elemento 
 
 Las reacciones verticales son prácticamente idénticas en ambos modelos, con diferencias inferiores al $0.1\%$. Las reacciones horizontales muestran una pequeña variación debido a la redistribución de esfuerzos.  En el modelo de nudos rígidos aparecen momentos reactivos que no existen en el modelo biarticulado. 
 
+\newpage
 \section{Conclusiones}
 
 \subsection{Conclusiones Generales}
