@@ -1,0 +1,665 @@
+\documentclass[12pt,a4paper]{article}
+
+% Paquetes necesarios
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{listings}
+\usepackage{xcolor}
+
+% Configuración de geometría y siunitx
+\geometry{margin=2.5cm}
+\sisetup{output-decimal-marker = {.}}
+
+% Configuración de encabezados
+\pagestyle{fancy}
+\setlength{\headheight}{14.49998pt}
+\fancyhf{}
+\rhead{Simulación de Materiales}
+\lhead{Trabajo de Curso}
+\cfoot{\thepage}
+
+% Configuración de código MATLAB
+\lstset{
+    language=Matlab,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green! 60!black},
+    stringstyle=\color{red},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=5pt,
+    backgroundcolor=\color{white},
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    frame=single,
+    tabsize=2,
+    captionpos=b,
+    breaklines=true,
+    breakatwhitespace=false
+}
+
+\title{\textbf{Trabajo de Curso -- Simulación de Materiales}}
+\author{Javier Rivero Iglesias} % TODO: Añadir nombre del autor
+\date{}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\tableofcontents
+\newpage
+
+\section{Introducción}
+
+El análisis estructural mediante el Método de Elementos Finitos (MEF) constituye una herramienta fundamental en la ingeniería moderna para predecir el comportamiento mecánico de estructuras bajo cargas externas. Este trabajo aborda el desarrollo de una aplicación computacional para el análisis de estructuras reticuladas planas bajo dos hipótesis fundamentales: 
+
+\begin{itemize}
+    \item \textbf{Nudos biarticulados: } Los elementos solo transmiten esfuerzos axiales (tracción o compresión), considerando 2 grados de libertad por nodo (desplazamientos en $x$ e $y$).
+    \item \textbf{Nudos rígidos:} Los elementos transmiten esfuerzos axiales y momentos flectores, considerando 3 grados de libertad por nodo (desplazamientos en $x$, $y$ y rotación $\theta$).
+\end{itemize}
+
+El objetivo principal es comparar el comportamiento estructural bajo ambas hipótesis, evaluando desplazamientos nodales, distribución de tensiones y reacciones en los apoyos. 
+
+\section{Descripción del Problema}
+
+\subsection{Geometría de la Estructura}
+
+La estructura analizada consiste en una cercha reticulada plana compuesta por: 
+
+\begin{itemize}
+    \item \textbf{24 nodos}
+    \item \textbf{51 barras}
+    \item \textbf{4 apoyos fijos} ubicados en los nodos 1, 2, 8 y 9 (base de la estructura)
+    \item \textbf{Longitud total: } \SI{50}{m}
+    \item \textbf{Altura total:} \SI{5}{m}
+\end{itemize}
+
+% TODO: Insertar figura con esquema general de la estructura mostrando numeración de nodos y barras
+\begin{figure}[htbp]
+    \centering
+    % \includegraphics[width=0.85\linewidth]{figuras/esquema_estructura.png}
+    \textcolor{red}{[PLACEHOLDER:  Insertar esquema general de la estructura con numeración de nodos, barras y dimensiones principales]}
+    \caption{Esquema general de la estructura reticulada. }
+    \label{fig:esquema_general}
+\end{figure}
+
+\subsection{Condiciones de Contorno}
+
+\subsubsection{Apoyos}
+
+Los apoyos se encuentran ubicados en la fila inferior de la estructura: 
+
+\begin{itemize}
+    \item \textbf{Nudos biarticulados:} Restricción de desplazamientos en $x$ e $y$ ($u_x = u_y = 0$)
+    \item \textbf{Nudos rígidos: } Restricción de desplazamientos y rotación ($u_x = u_y = \theta = 0$)
+\end{itemize}
+
+\subsubsection{Cargas}
+
+Se aplican cargas verticales concentradas en los nodos de la banda de rodadura (nodos 1 a 9):
+
+\begin{table}[ht]
+\centering
+\caption{Cargas aplicadas en la estructura.}
+\label{tab:cargas}
+\begin{tabular}{@{}cc@{}}
+\toprule
+Nodos & Fuerza vertical [N] \\
+\midrule
+1, 9 & $-125\,000$ \\
+2, 3, 4, 5, 6, 7, 8 & $-250\,000$ \\
+\midrule
+\textbf{Total} & $-2\,000\,000$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Propiedades de los Materiales}
+
+La estructura está compuesta por tres tipos de materiales con las siguientes propiedades:
+
+\begin{table}[ht]
+\centering
+\caption{Propiedades mecánicas de los materiales.}
+\label{tab:materiales}
+\begin{tabular}{@{}ccc@{}}
+\toprule
+Material & Módulo de Young $E$ [Pa] & Límite elástico $\sigma_y$ [Pa] \\
+\midrule
+1 & $2.00\times10^{11}$ & $2.50\times10^{8}$ \\
+2 & $1.60\times10^{11}$ & $2.50\times10^{8}$ \\
+3 & $1.60\times10^{11}$ & $2.10\times10^{8}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Propiedades Geométricas de las Secciones}
+
+Se consideran tres tipos de secciones transversales:
+
+\begin{table}[ht]
+\centering
+\caption{Propiedades geométricas de las secciones.}
+\label{tab:secciones}
+\begin{tabular}{@{}ccc@{}}
+\toprule
+Sección & Área $A$ [m$^2$] & Momento de inercia $I$ [m$^4$] \\
+\midrule
+1 & 0.0150 & $2.80\times10^{-5}$ \\
+2 & 0.0144 & $1.728\times10^{-5}$ \\
+3 & 0.0254 & $5.153\times10^{-5}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Fundamentos Teóricos}
+
+\subsection{Método de Elementos Finitos}
+
+El Método de Elementos Finitos (MEF) discretiza la estructura continua en elementos finitos conectados por nodos. Para cada elemento se establece una relación entre fuerzas nodales y desplazamientos mediante la matriz de rigidez: 
+
+\begin{equation}
+\mathbf{f} = \mathbf{K} \mathbf{u}
+\end{equation}
+
+donde $\mathbf{f}$ es el vector de fuerzas nodales, $\mathbf{K}$ la matriz de rigidez y $\mathbf{u}$ el vector de desplazamientos.
+
+\subsection{Modelo de Nudos Biarticulados}
+
+En este modelo, cada nodo tiene 2 grados de libertad ($u_x$, $u_y$). La matriz de rigidez local de un elemento tipo barra es:
+
+\begin{equation}
+\mathbf{k}^{local} = \frac{EA}{L}
+\begin{bmatrix}
+1 & 0 & -1 & 0 \\
+0 & 0 & 0 & 0 \\
+-1 & 0 & 1 & 0 \\
+0 & 0 & 0 & 0
+\end{bmatrix}
+\end{equation}
+
+donde $E$ es el módulo de Young, $A$ el área de la sección transversal y $L$ la longitud del elemento.
+
+La transformación al sistema global se realiza mediante la matriz de rotación $\mathbf{T}$:
+
+\begin{equation}
+\mathbf{T} = 
+\begin{bmatrix}
+\cos\alpha & \sin\alpha & 0 & 0 \\
+-\sin\alpha & \cos\alpha & 0 & 0 \\
+0 & 0 & \cos\alpha & \sin\alpha \\
+0 & 0 & -\sin\alpha & \cos\alpha
+\end{bmatrix}
+\end{equation}
+
+siendo $\alpha$ el ángulo que forma el elemento con el eje horizontal.
+
+La matriz de rigidez global del elemento es:
+
+\begin{equation}
+\mathbf{K}^{global} = \mathbf{T}^T \mathbf{k}^{local} \mathbf{T}
+\end{equation}
+
+La tensión axial en cada barra se calcula como:
+
+\begin{equation}
+\sigma = E \frac{\Delta L}{L}
+\end{equation}
+
+donde $\Delta L$ es el alargamiento o acortamiento del elemento.
+
+\subsection{Modelo de Nudos Rígidos}
+
+En este modelo, cada nodo tiene 3 grados de libertad ($u_x$, $u_y$, $\theta$). Se emplea la matriz de rigidez de viga de Euler-Bernoulli (6$\times$6):
+
+\begin{equation}
+\mathbf{k}^{local} = 
+\begin{bmatrix}
+\frac{EA}{L} & 0 & 0 & -\frac{EA}{L} & 0 & 0 \\
+0 & \frac{12EI}{L^3} & \frac{6EI}{L^2} & 0 & -\frac{12EI}{L^3} & \frac{6EI}{L^2} \\
+0 & \frac{6EI}{L^2} & \frac{4EI}{L} & 0 & -\frac{6EI}{L^2} & \frac{2EI}{L} \\
+-\frac{EA}{L} & 0 & 0 & \frac{EA}{L} & 0 & 0 \\
+0 & -\frac{12EI}{L^3} & -\frac{6EI}{L^2} & 0 & \frac{12EI}{L^3} & -\frac{6EI}{L^2} \\
+0 & \frac{6EI}{L^2} & \frac{2EI}{L} & 0 & -\frac{6EI}{L^2} & \frac{4EI}{L}
+\end{bmatrix}
+\end{equation}
+
+donde $I$ es el momento de inercia de la sección transversal.
+
+La tensión total en cada barra considera tanto el esfuerzo axial como el flector:
+
+\begin{equation}
+\sigma_{total} = \sigma_{axial} + \sigma_{flexión} = E\frac{\Delta L}{L} + \frac{M \cdot c}{I}
+\end{equation}
+
+donde $M$ es el momento flector máximo y $c$ es la distancia desde el eje neutro a la fibra extrema.
+
+\subsection{Ensamblaje del Sistema Global}
+
+El sistema global de ecuaciones se expresa como:
+
+\begin{equation}
+\begin{bmatrix}
+\mathbf{S}_{pp} & \mathbf{S}_{pd} \\
+\mathbf{S}_{dp} & \mathbf{S}_{dd}
+\end{bmatrix}
+\begin{bmatrix}
+\mathbf{d}_p \\
+\mathbf{d}_d
+\end{bmatrix}
+=
+\begin{bmatrix}
+\mathbf{p}_p \\
+\mathbf{p}_d
+\end{bmatrix}
+\end{equation}
+
+donde el subíndice $p$ denota grados de libertad prescritos (apoyos) y $d$ los grados de libertad libres.
+
+Los desplazamientos libres se obtienen resolviendo: 
+
+\begin{equation}
+\mathbf{d}_d = \mathbf{S}_{dd}^{-1} (\mathbf{p}_d - \mathbf{S}_{dp} \mathbf{d}_p)
+\end{equation}
+
+Las reacciones en los apoyos se calculan como:
+
+\begin{equation}
+\mathbf{p}_p = \mathbf{S}_{pp} \mathbf{d}_p + \mathbf{S}_{pd} \mathbf{d}_d
+\end{equation}
+
+\section{Implementación Computacional}
+
+\subsection{Arquitectura del Programa}
+
+El programa se ha estructurado en cuatro módulos principales siguiendo el flujo de trabajo típico del MEF:
+
+\begin{enumerate}
+    \item \textbf{Lectura de datos} (\texttt{read\_input.m})
+    \item \textbf{Preprocesamiento} (\texttt{preprocessor.m})
+    \item \textbf{Procesamiento} (\texttt{processor.m})
+    \item \textbf{Postprocesamiento} (\texttt{postprocessor.m})
+\end{enumerate}
+
+% TODO: Insertar diagrama de flujo del programa
+\begin{figure}[htbp]
+    \centering
+    % \includegraphics[width=0.7\linewidth]{figuras/diagrama_flujo.png}
+    \textcolor{red}{[PLACEHOLDER: Insertar diagrama de flujo mostrando la secuencia:  Input → Lectura → Preprocesamiento → Procesamiento → Postprocesamiento → Output]}
+    \caption{Diagrama de flujo del programa de análisis estructural. }
+    \label{fig:diagrama_flujo}
+\end{figure}
+
+\subsection{Módulo de Lectura de Datos}
+
+Este módulo (\texttt{read\_input.m}) lee el archivo de texto \texttt{estructura.txt} que contiene: 
+
+\begin{itemize}
+    \item Coordenadas de los nodos
+    \item Definición de apoyos
+    \item Propiedades de materiales
+    \item Propiedades de secciones
+    \item Conectividad de elementos (barras)
+    \item Cargas aplicadas
+\end{itemize}
+
+La función devuelve una estructura \texttt{PROB} con todos los datos organizados para su posterior procesamiento.
+
+\subsection{Módulo de Preprocesamiento}
+
+El preprocesamiento realiza las siguientes tareas:
+
+\begin{enumerate}
+    \item Cálculo de matrices de rigidez locales para cada elemento
+    \item Cálculo de matrices de transformación de coordenadas
+    \item Obtención de matrices de rigidez globales
+    \item Ensamblaje de la matriz de rigidez global del sistema
+    \item Visualización gráfica de la estructura
+\end{enumerate}
+
+\textbf{Diferencias entre modelos:}
+
+\begin{itemize}
+    \item \textbf{Nudos biarticulados: } Matriz global de tamaño $48 \times 48$ (24 nodos × 2 GDL)
+    \item \textbf{Nudos rígidos:} Matriz global de tamaño $72 \times 72$ (24 nodos × 3 GDL)
+\end{itemize}
+
+\subsection{Módulo de Procesamiento}
+
+Este módulo resuelve el sistema de ecuaciones: 
+
+\begin{enumerate}
+    \item Ensamblaje del vector de fuerzas nodales
+    \item Identificación de grados de libertad prescritos y libres
+    \item Partición de la matriz de rigidez global
+    \item Resolución del sistema para obtener desplazamientos
+    \item Cálculo de tensiones en cada elemento
+    \item Verificación del criterio de fallo (tensión > límite elástico)
+    \item Cálculo de reacciones en los apoyos
+\end{enumerate}
+
+\subsection{Módulo de Postprocesamiento}
+
+El postprocesamiento genera: 
+
+\begin{enumerate}
+    \item Visualización de la estructura deformada con escala amplificada
+    \item Mapa de colores representando la distribución de tensiones
+    \item Identificación visual de barras fallidas
+    \item Exportación de resultados numéricos
+    \item Generación de gráficos para el análisis
+\end{enumerate}
+
+% TODO: Insertar captura de pantalla del output de consola MATLAB
+\begin{figure}[htbp]
+    \centering
+    % \includegraphics[width=0.9\linewidth]{figuras/output_matlab.png}
+    \textcolor{red}{[PLACEHOLDER:  Insertar captura de la consola de MATLAB mostrando los mensajes de ejecución de los 4 pasos]}
+    \caption{Output de consola durante la ejecución del programa.}
+    \label{fig:output_matlab}
+\end{figure}
+
+\section{Resultados}
+
+\subsection{Resultados para Nudos Biarticulados}
+
+\subsubsection{Visualización de la Estructura}
+
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.85\linewidth]{\detokenize{Nudos biarticulados/figuras/estructura.png}}
+    \caption{Representación gráfica de la estructura con nudos biarticulados.  Los colores indican diferentes tipos de sección. }
+    \label{fig: estructura_biarticulado}
+\end{figure}
+
+\subsubsection{Desplazamientos Nodales}
+
+El desplazamiento máximo se produce en el nodo central superior (nodo 5):
+
+\begin{equation}
+|u_{max}| = \sqrt{u_x^2 + u_y^2} = \SI{1.3055e-2}{m} \approx \SI{13.06}{mm}
+\end{equation}
+
+El desplazamiento es predominantemente vertical (en dirección de las cargas aplicadas).
+
+\subsubsection{Distribución de Tensiones}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\linewidth]{\detokenize{Nudos biarticulados/figuras/deformada.png}}
+    \caption{Estructura deformada y distribución de tensiones para nudos biarticulados.  La escala de colores representa la magnitud de la tensión axial.}
+    \label{fig:deformada_biarticulado}
+\end{figure}
+
+Los resultados de tensiones muestran:
+
+\begin{itemize}
+    \item \textbf{Tensión máxima: } $\sigma_{max} = -\SI{5.562e7}{Pa}$ (compresión) en la barra 48
+    \item \textbf{Barras a compresión:} Cordón superior y diagonales principales
+    \item \textbf{Barras a tracción:} Cordón inferior y montantes
+    \item \textbf{Barras fallidas:} Ninguna (todas las tensiones están por debajo del límite elástico)
+\end{itemize}
+
+\subsubsection{Reacciones en los Apoyos}
+
+\begin{table}[ht]
+\centering
+\caption{Reacciones en los apoyos -- Nudos biarticulados. }
+\label{tab:reacciones_biarticulado}
+\begin{tabular}{@{}ccc@{}}
+\toprule
+Nodo & $R_x$ [N] & $R_y$ [N] \\
+\midrule
+1 & $-4.5035\times10^{5}$ & $-2.3528\times10^{5}$ \\
+2 & $9.8652\times10^{5}$ & $1.2353\times10^{6}$ \\
+8 & $-9.8652\times10^{5}$ & $1.2353\times10^{6}$ \\
+9 & $4.5035\times10^{5}$ & $-2.3528\times10^{5}$ \\
+\midrule
+\textbf{Suma} & $\approx 0$ & $\SI{2.0e6}{N}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Verificación del equilibrio: }
+
+\begin{itemize}
+    \item $\sum R_x \approx 0$ \(\checkmark\) (equilibrio de fuerzas horizontales)
+    \item $\sum R_y = \SI{2.0e6}{N}$ \(\checkmark\) (equilibrio con carga total aplicada)
+\end{itemize}
+
+\subsection{Resultados para Nudos Rígidos}
+
+\subsubsection{Visualización de la Estructura}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\linewidth]{\detokenize{Nudos Rígidos/figuras/estructura.png}}
+    \caption{Representación gráfica de la estructura con nudos rígidos. }
+    \label{fig: estructura_rigido}
+\end{figure}
+
+\subsubsection{Desplazamientos Nodales}
+
+El desplazamiento máximo se produce igualmente en el nodo 5: 
+
+\begin{equation}
+|u_{max}| = \SI{1.3019e-2}{m} \approx \SI{13.02}{mm}
+\end{equation}
+
+Se observa una ligera reducción ($\approx 0.28\%$) respecto al modelo biarticulado debido a la rigidez adicional proporcionada por la resistencia a flexión.
+
+\subsubsection{Distribución de Tensiones}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\linewidth]{\detokenize{Nudos Rígidos/figuras/deformada.png}}
+    \caption{Estructura deformada y distribución de tensiones para nudos rígidos. }
+    \label{fig: deformada_rigido}
+\end{figure}
+
+Resultados de tensiones combinadas (axial + flexión):
+
+\begin{itemize}
+    \item \textbf{Tensión máxima:} $\sigma_{max} = -\SI{5.504e7}{Pa}$ (compresión) en la barra 48
+    \item \textbf{Reducción:} $\approx 1.04\%$ respecto al modelo biarticulado
+    \item \textbf{Barras fallidas:} Ninguna
+\end{itemize}
+
+\subsubsection{Reacciones en los Apoyos}
+
+\begin{table}[ht]
+\centering
+\caption{Reacciones en los apoyos -- Nudos rígidos.}
+\label{tab:reacciones_rigido}
+\begin{tabular}{@{}cccc@{}}
+\toprule
+Nodo & $R_x$ [N] & $R_y$ [N] & $M$ [N·m] \\
+\midrule
+1 & $-4.4821\times10^{5}$ & $-2.3491\times10^{5}$ & $-1.53\times10^{3}$ \\
+2 & $9.8239\times10^{5}$ & $1.2349\times10^{6}$ & $1.1453\times10^{4}$ \\
+8 & $-9.8239\times10^{5}$ & $1.2349\times10^{6}$ & $-1.1453\times10^{4}$ \\
+9 & $4.4821\times10^{5}$ & $-2.3491\times10^{5}$ & $1.53\times10^{3}$ \\
+\midrule
+\textbf{Suma} & $\approx 0$ & $\SI{2.0e6}{N}$ & $\approx 0$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Verificación del equilibrio:}
+
+\begin{itemize}
+    \item $\sum R_x \approx 0$ \(\checkmark\)
+    \item $\sum R_y = \SI{2.0e6}{N}$ \(\checkmark\)
+    \item $\sum M \approx 0$ \(\checkmark\) (equilibrio de momentos)
+\end{itemize}
+
+\section{Análisis Comparativo}
+
+\subsection{Comparación de Desplazamientos}
+
+\begin{table}[ht]
+\centering
+\caption{Comparación de desplazamientos máximos. }
+\label{tab:comparacion_desplazamientos}
+\begin{tabular}{@{}ccc@{}}
+\toprule
+Modelo & Desplazamiento máximo [mm] & Diferencia [\%] \\
+\midrule
+Nudos biarticulados & 13.055 & -- \\
+Nudos rígidos & 13.019 & $-0.28$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La incorporación de rigidez rotacional produce una reducción marginal en los desplazamientos.  Esto indica que, para esta configuración geométrica y tipo de carga, el comportamiento está dominado por esfuerzos axiales. 
+
+\subsection{Comparación de Tensiones}
+
+\begin{table}[ht]
+\centering
+\caption{Comparación de tensiones máximas.}
+\label{tab:comparacion_tensiones}
+\begin{tabular}{@{}cccc@{}}
+\toprule
+Modelo & Barra crítica & $\sigma_{max}$ [MPa] & Diferencia [\%] \\
+\midrule
+Nudos biarticulados & 48 & $-55.62$ & -- \\
+Nudos rígidos & 48 & $-55.04$ & $-1.04$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La barra crítica (48) es la misma en ambos modelos y corresponde a un elemento del cordón superior sometido a compresión. La reducción del $1.04\%$ en la tensión máxima se debe a la redistribución parcial de esfuerzos gracias a la capacidad de transmitir momentos flectores en el modelo rígido.
+
+\subsection{Comparación de Reacciones}
+
+Las reacciones verticales son prácticamente idénticas en ambos modelos, con diferencias inferiores al $0.1\%$. Las reacciones horizontales muestran una pequeña variación debido a la redistribución de esfuerzos.  En el modelo de nudos rígidos aparecen momentos reactivos que no existen en el modelo biarticulado. 
+
+\section{Conclusiones}
+
+\begin{enumerate}
+    \item Se ha desarrollado exitosamente un programa modular en MATLAB para el análisis de estructuras reticuladas planas mediante el Método de Elementos Finitos, implementando dos hipótesis de conexión:  nudos biarticulados y nudos rígidos.
+    
+    \item Para la estructura analizada, ambos modelos proporcionan resultados muy similares en términos de desplazamientos (diferencia $< 0.3\%$) y tensiones (diferencia $< 1.1\%$), lo que confirma que el comportamiento está dominado por esfuerzos axiales.
+    
+    \item El modelo de nudos biarticulados es suficientemente preciso para el análisis de esta estructura, con la ventaja de requerir un $33\%$ menos de grados de libertad y menor tiempo de cálculo.
+    
+    \item El modelo de nudos rígidos proporciona información adicional sobre momentos flectores y rotaciones, aunque su magnitud es pequeña para esta configuración geométrica.
+    
+    \item La estructura presenta un comportamiento seguro bajo las cargas especificadas, con tensiones máximas que representan solo el $22\%$ del límite elástico más restrictivo.
+    
+    \item La arquitectura modular del programa (lectura, preprocesamiento, procesamiento, postprocesamiento) facilita la extensión y modificación para análisis de estructuras más complejas. 
+    
+    \item Los resultados numéricos han sido validados mediante verificación de equilibrio estático y simetría, confirmando la corrección de la implementación.
+\end{enumerate}
+
+\appendix
+
+\section{Código Fuente}
+
+\subsection{Función principal (main.m)}
+
+\begin{lstlisting}[caption=Script principal de ejecución]
+clc;
+clear all;
+
+%% Paso 1 y 2: Lectura de input y Preprocesamiento
+disp('--- Paso 1: Lectura de input ---');
+disp('Lectura de input completada');
+
+disp('--- Paso 2: Preprocesamiento ---');
+preprocessor("estructura.txt");
+disp('Preprocesamiento completado');
+
+%% Paso 3: Procesamiento
+disp('--- Paso 3: Procesamiento ---');
+processor;
+disp('Procesamiento completado');
+
+%% Paso 4: Postprocesamiento
+disp('--- Paso 4: Postprocesamiento ---');
+postprocessor;
+disp('Postprocesamiento completado');
+
+disp('--- Simulacion completada correctamente ---');
+\end{lstlisting}
+
+\subsection{Formato del archivo de entrada}
+
+El archivo \texttt{estructura.txt} sigue el siguiente formato:
+
+\begin{lstlisting}[language=bash, caption=Estructura del archivo de entrada]
+<n_nodos>
+<x1>,<y1>
+<x2>,<y2>
+... 
+<n_soportes>
+<nodo>,<rest_x>,<rest_y>
+... 
+<n_materiales>
+<E>,<sigma_y>
+... 
+<n_secciones>
+<A>,<I>
+...
+<n_barras>
+<nodo1>,<nodo2>,<tipo_mat>,<tipo_secc>
+...
+<n_cargas>
+<nodo>,<Fx>,<Fy>
+...
+\end{lstlisting}
+
+\section{Resultados Numéricos Detallados}
+
+% TODO: Insertar tabla completa de desplazamientos nodales
+\begin{table}[ht]
+\centering
+\caption{Desplazamientos nodales completos -- Nudos biarticulados. }
+\label{tab:desplazamientos_completos}
+\textcolor{red}{[PLACEHOLDER: Insertar tabla con desplazamientos $u_x$ y $u_y$ de los 24 nodos]}
+\end{table}
+
+% TODO: Insertar tabla completa de tensiones en barras
+\begin{table}[ht]
+\centering
+\caption{Tensiones en todas las barras. }
+\label{tab:tensiones_completas}
+\textcolor{red}{[PLACEHOLDER: Insertar tabla con tensiones de las 51 barras para ambos modelos]}
+\end{table}
+
+\section{Verificación del Equilibrio}
+
+\subsection{Equilibrio de Fuerzas}
+
+Para el modelo de nudos biarticulados: 
+
+\begin{align}
+\sum F_x &= (-450350 + 986520 - 986520 + 450350) = 0 \, \text{N} \quad \checkmark \\
+\sum F_y &= (-235280 + 1235300 + 1235300 - 235280) = 2000040 \, \text{N} \approx 2.0\times10^6 \, \text{N} \quad \checkmark
+\end{align}
+
+\subsection{Simetría}
+
+Verificación de simetría en reacciones: 
+
+\begin{align}
+R_{x,1} &= -R_{x,9} = -450350 \, \text{N} \quad \checkmark \\
+R_{x,2} &= -R_{x,8} = 986520 \, \text{N} \quad \checkmark \\
+R_{y,1} &= R_{y,9} = -235280 \, \text{N} \quad \checkmark \\
+R_{y,2} &= R_{y,8} = 1235300 \, \text{N} \quad \checkmark
+\end{align}
+
+\end{document}
