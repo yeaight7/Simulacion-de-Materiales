@@ -82,6 +82,7 @@ function postprocessor
     axis equal;
     grid on;
     hold off;
+	saveas(gcf, 'figuras/deformada.png');
     
     % Resumen
     disp(' ');

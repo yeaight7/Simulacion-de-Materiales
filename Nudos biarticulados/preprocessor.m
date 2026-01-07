@@ -8,9 +8,7 @@ function preprocessor(file)
     n_nod = size(PROB.nodos, 1);
 
     % Inicialización de matrices (Reserva de memoria)
-    % matrices_k = zeros(4, 4, n_ele);    % Matrices de rigidez locales
-    % matrices_T = zeros(4, 4, n_ele);    % Matrices de giro
-    % matrices_K = zeros(4, 4, n_ele);    % Matrices de rigidez globales
+
     S = zeros(n_nod * 2);                 % Matriz global ensamblada
 
     % Calcular matrices locales, giros y globales
@@ -28,53 +26,16 @@ function preprocessor(file)
 
     disp(S);
 
-    % ****************************** GRÁFICA ******************************
-    % figure;
-    % hold on;
-    % 
-    % for ele = 1:n_ele
-    %     nodo1 = PROB.miembros(ele, 1);
-    %     nodo2 = PROB.miembros(ele, 2);
-    %     tipo_seccion = PROB.miembros(ele, 4);
-    % 
-    %     x = [PROB.nodos(nodo1, 1), PROB.nodos(nodo2, 1)];
-    %     y = [PROB.nodos(nodo1, 2), PROB.nodos(nodo2, 2)];
-    % 
-    %     if tipo_seccion == 1
-    %         plot(x, y, 'r-', 'LineWidth', 1.5);
-    %     elseif tipo_seccion == 2
-    %         plot(x, y, 'g-', 'LineWidth', 1.5);
-    %     elseif tipo_seccion == 3
-    %         plot(x, y, 'b-', 'LineWidth', 1.5);
-    %     end
-    % 
-    %     mid_x = mean(x);
-    %     mid_y = mean(y);
-    %     text(mid_x, mid_y, ['E', num2str(ele)], 'FontSize', 8, 'Color', 'k');
-    % end
-    % 
-    % scatter(PROB.nodos(:, 1), PROB.nodos(:, 2), 52, 'filled', 'k');
-    % for nodo = 1:n_nod
-    %     text(PROB.nodos(nodo, 1), PROB.nodos(nodo, 2), ['N', num2str(nodo)], 'FontSize', 10, 'Color', 'r');
-    % end
-    % 
-    % xlabel('X (m)');
-    % ylabel('Y (m)');
-    % title('Representación Gráfica de la Estructura');
-    % axis equal;
-    % grid on;
-    % hold off;
-
     % Extract data
-    nodes = PROB.nodos;          % Node coordinates
-    ele = PROB.miembros;   % Element connectivity
+    nodes = PROB.nodos;          
+    ele = PROB.miembros;   
 
     % Initialize figure
     figure;
     hold on;
 
     % Plot nodes
-    scatter(nodes(:, 1), nodes(:, 2), 50, 'filled', 'b'); % Nodes as blue dots
+    scatter(nodes(:, 1), nodes(:, 2), 50, 'filled', 'b'); 
     % Label nodes
     for i = 1:size(nodes, 1)
         text(nodes(i, 1), nodes(i, 2), ['  ', num2str(i)], 'FontSize', 10); 
@@ -88,14 +49,14 @@ function preprocessor(file)
         node2 = ele(i, 2);
         x = [nodes(node1, 1), nodes(node2, 1)];
         y = [nodes(node1, 2), nodes(node2, 2)];
-        sec = ele(i, 4); % Material type % Label Elements at the midpoint of the line
+        sec = ele(i, 4); 
 
         if sec == 1
-            plot(x, y, 'r-', 'LineWidth', 1.5); % Red for section 1
+            plot(x, y, 'r-', 'LineWidth', 1.5); 
         elseif sec == 2
-            plot(x, y, 'g-', 'LineWidth', 1.5); % Green for section 2
+            plot(x, y, 'g-', 'LineWidth', 1.5); 
         elseif sec == 3
-            plot(x, y, 'b-', 'LineWidth', 1.5); % blue for section2
+            plot(x, y, 'b-', 'LineWidth', 1.5); 
         end
         % Label Elements at the midpoint of the line
         mid_x = mean(x);
@@ -112,6 +73,7 @@ function preprocessor(file)
     axis equal;
     grid on;
     hold off;
+	saveas(gcf, 'figuras/estructura.png');
 
     % Guardar resultados
     save('preprocessing_data.mat', 'S', 'matrices_k', 'matrices_T', 'matrices_K', 'PROB');

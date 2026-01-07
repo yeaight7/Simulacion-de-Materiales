@@ -66,6 +66,7 @@ function preprocessor(file)
     axis equal;
     grid on;
     hold off;
+	saveas(gcf, 'figuras/estructura.png');
 
     % Guardar resultados
     save('preprocessing_rigidos_data.mat', 'S', 'matrices_k', 'matrices_T', 'matrices_K', 'PROB');
