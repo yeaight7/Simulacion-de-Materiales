@@ -1,22 +1,51 @@
 clc;
 clear all;
 
-%% Paso 1 y 2: Lectura de input y Preprocesamiento
-disp('--- Paso 1: Lectura de input ---');
-disp('Lectura de input completada');
+% Abrir archivo para guardar resultados
+output_file = 'output_resultados.txt';
+fid = fopen(output_file, 'w');
 
-disp('--- Paso 2: Preprocesamiento ---');
-preprocessor("estructura.txt");
-disp('Preprocesamiento completado');
+fprintf(fid, '==========================================================\n');
+fprintf(fid, '   ANÁLISIS ESTRUCTURAL - NUDOS RÍGIDOS\n');
+fprintf(fid, '   Fecha: %s\n', datestr(now, 'dd/mm/yyyy HH:MM:SS'));
+fprintf(fid, '==========================================================\n\n');
+
+disp('==========================================================');
+disp('   ANÁLISIS ESTRUCTURAL - NUDOS RÍGIDOS');
+disp('==========================================================');
+disp(' ');
+
+%% Paso 1: Lectura de input
+disp('Paso 1: Lectura de input...');
+fprintf(fid, 'Paso 1: Lectura de input\n');
+fprintf(fid, '   Estado: Completado\n\n');
+
+%% Paso 2: Preprocesamiento
+disp('Paso 2: Preprocesamiento...');
+fprintf(fid, 'Paso 2: Preprocesamiento\n');
+preprocessor("estructura.txt", fid);
+fprintf(fid, '   Estado: Completado\n\n');
 
 %% Paso 3: Procesamiento
-disp('--- Paso 3: Procesamiento ---');
-processor;
-disp('Procesamiento completado');
+disp('Paso 3: Procesamiento...');
+fprintf(fid, 'Paso 3: Procesamiento\n');
+processor(fid);
+fprintf(fid, '   Estado: Completado\n\n');
 
 %% Paso 4: Postprocesamiento
-disp('--- Paso 4: Postprocesamiento ---');
-postprocessor;
-disp('Postprocesamiento completado');
+disp('Paso 4: Postprocesamiento...');
+fprintf(fid, 'Paso 4: Postprocesamiento\n');
+postprocessor(fid);
+fprintf(fid, '   Estado: Completado\n\n');
 
-disp('--- Simulación completada correctamente ---');
+fprintf(fid, '==========================================================\n');
+fprintf(fid, '   SIMULACIÓN COMPLETADA CORRECTAMENTE\n');
+fprintf(fid, '==========================================================\n');
+
+fclose(fid);
+
+disp(' ');
+disp('==========================================================');
+disp('   SIMULACIÓN COMPLETADA CORRECTAMENTE');
+disp('==========================================================');
+disp(['Resultados guardados en: ', output_file]);

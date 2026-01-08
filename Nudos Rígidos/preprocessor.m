@@ -1,20 +1,16 @@
-function preprocessor(file)
+function preprocessor(file, fid)
 
-    % Cargar datos
     PROB = read_input(file);
 
     n_ele = size(PROB.miembros, 1);
     n_nod = size(PROB.nodos, 1);
 
-    % Inicializar matrices (3 GDL por nodo)
     S = zeros(n_nod * 3);
 
-    % Calcular matrices locales, giros y globales
     matrices_k = crea_k(PROB, n_ele);
     matrices_T = crea_T(PROB, n_ele);
     matrices_K = crea_K(matrices_k, matrices_T, n_ele);
 
-    % Ensamblaje de la matriz global de rigidez (S)
     for ele = 1:n_ele
         nodo1 = PROB.miembros(ele, 1);
         nodo2 = PROB.miembros(ele, 2);
@@ -22,23 +18,25 @@ function preprocessor(file)
         S(gdl, gdl) = S(gdl, gdl) + matrices_K(:, :, ele);
     end
 
-    disp('Matriz de rigidez global (S) para nudos rígidos:');
-    disp(S);
+    fprintf(fid, '   Número de nodos: %d\n', n_nod);
+    fprintf(fid, '   Número de elementos: %d\n', n_ele);
+    fprintf(fid, '   Grados de libertad totales: %d\n', n_nod * 3);
+    fprintf(fid, '   Tamaño matriz de rigidez: %dx%d\n', size(S, 1), size(S, 2));
 
-    % Visualización de la estructura
+    disp(['   Nodos: ', num2str(n_nod), ' | Elementos: ', num2str(n_ele)]);
+    disp(['   Grados de libertad: ', num2str(n_nod * 3)]);
+
     nodes = PROB.nodos;
     ele = PROB.miembros;
 
     figure;
     hold on;
 
-    % Dibujar nodos
     scatter(nodes(:, 1), nodes(:, 2), 50, 'filled', 'b');
     for i = 1:size(nodes, 1)
         text(nodes(i, 1), nodes(i, 2), ['  ', num2str(i)], 'FontSize', 10); 
     end
 
-    % Dibujar elementos con diferentes colores según tipo
     for i = 1:size(ele, 1)
         node1 = ele(i, 1);
         node2 = ele(i, 2);
@@ -66,32 +64,29 @@ function preprocessor(file)
     axis equal;
     grid on;
     hold off;
-	saveas(gcf, 'figuras/estructura.png');
+    saveas(gcf, 'figuras/estructura.png');
 
-    % Guardar resultados
     save('preprocessing_rigidos_data.mat', 'S', 'matrices_k', 'matrices_T', 'matrices_K', 'PROB');
 end
 
-%% ----------------------------- FUNCIONES ----------------------------- %%
+%% Funciones auxiliares
 
 function matrices_k = crea_k(PROB, n_ele)
-    % Crea matrices de rigidez locales 6x6 para vigas con nudos rígidos
     matrices_k = zeros(6, 6, n_ele);
 
     for ele = 1:n_ele
         i_mat = PROB.miembros(ele, 3);
-        E = PROB.material(i_mat, 1);  % Módulo de Young
+        E = PROB.material(i_mat, 1);
         
         i_sec = PROB.miembros(ele, 4);
-        A = PROB.seccion(i_sec, 1);   % Área
-        I = PROB.seccion(i_sec, 2);   % Momento de inercia
+        A = PROB.seccion(i_sec, 1);
+        I = PROB.seccion(i_sec, 2);
         
         nodo1 = PROB.miembros(ele, 1);
         nodo2 = PROB.miembros(ele, 2);
         delta = PROB.nodos(nodo2,:) - PROB.nodos(nodo1,:);
         L = norm(delta);
 
-        % Matriz de rigidez local 6x6 (viga de Euler-Bernoulli)
         matrices_k(:, :, ele) = [
             E*A/L,           0,              0,          -E*A/L,          0,              0;
             0,               12*E*I/L^3,     6*E*I/L^2,  0,               -12*E*I/L^3,    6*E*I/L^2;
@@ -103,9 +98,7 @@ function matrices_k = crea_k(PROB, n_ele)
     end
 end
 
-% -------------------------------------------------------------------------
 function matrices_T = crea_T(PROB, n_ele)
-    % Crea matrices de transformación 6x6
     matrices_T = zeros(6, 6, n_ele);
     th = zeros(1, n_ele);
 
@@ -119,7 +112,6 @@ function matrices_T = crea_T(PROB, n_ele)
         c = cosd(th(ele));
         s = sind(th(ele));
 
-        % Matriz de transformación 6x6
         matrices_T(:, :, ele) = [
             c,  s,  0,  0,  0,  0;
             -s, c,  0,  0,  0,  0;
@@ -131,9 +123,7 @@ function matrices_T = crea_T(PROB, n_ele)
     end
 end
 
-% -------------------------------------------------------------------------
 function matrices_K = crea_K(matrices_k, matrices_T, n_ele)
-    % Transforma matrices locales a globales
     matrices_K = zeros(6, 6, n_ele);
     for ele = 1:n_ele
         matrices_K(:, :, ele) = matrices_T(:, :, ele)' * matrices_k(:, :, ele) * matrices_T(:, :, ele);

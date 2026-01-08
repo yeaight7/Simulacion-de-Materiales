@@ -1,22 +1,16 @@
-function preprocessor(file)
+function preprocessor(file, fid)
 
-    % Cargar datos
     PROB = read_input(file);
 
-    % Número de elementos y nodos
     n_ele = size(PROB.miembros, 1);
     n_nod = size(PROB.nodos, 1);
 
-    % Inicialización de matrices (Reserva de memoria)
+    S = zeros(n_nod * 2);
 
-    S = zeros(n_nod * 2);                 % Matriz global ensamblada
-
-    % Calcular matrices locales, giros y globales
     matrices_k = crea_k(PROB, n_ele);
     matrices_T = crea_T(PROB, n_ele);
     matrices_K = crea_K(matrices_k, matrices_T, n_ele);
 
-    % Ensamblaje de la matriz global de rigidez (S)
     for ele = 1:n_ele
         nodo1 = PROB.miembros(ele, 1);
         nodo2 = PROB.miembros(ele, 2);
@@ -24,26 +18,24 @@ function preprocessor(file)
         S(gdl, gdl) = S(gdl, gdl) + matrices_K(:, :, ele);
     end
 
-    disp('Matriz S:');
-    S
+    fprintf(fid, '   Número de nodos: %d\n', n_nod);
+    fprintf(fid, '   Número de elementos: %d\n', n_ele);
+    fprintf(fid, '   Grados de libertad totales: %d\n', n_nod * 2);
+    fprintf(fid, '   Tamaño matriz de rigidez: %dx%d\n', size(S, 1), size(S, 2));
 
-    % extraer datos
+    disp(['   Nodos: ', num2str(n_nod), ' | Elementos: ', num2str(n_ele)]);
+    disp(['   Grados de libertad: ', num2str(n_nod * 2)]);
+
     nodes = PROB.nodos;          
     ele = PROB.miembros;   
 
-    % Representación gráfica
     figure;
     hold on;
 
-    % Plot nodes
     scatter(nodes(:, 1), nodes(:, 2), 50, 'filled', 'b'); 
-    % Label nodes
     for i = 1:size(nodes, 1)
         text(nodes(i, 1), nodes(i, 2), ['  ', num2str(i)], 'FontSize', 10); 
     end
-
-    % Plot elements
-
 
     for i = 1:size(ele, 1)
         node1 = ele(i, 1);
@@ -59,28 +51,25 @@ function preprocessor(file)
         elseif sec == 3
             plot(x, y, 'b-', 'LineWidth', 1.5); 
         end
-        % Label Elements at the midpoint of the line
+
         mid_x = mean(x);
         mid_y = mean(y);
-        text(mid_x, mid_y, sprintf('E%d', i),'VerticalAlignment', 'middle', 'HorizontalAlignment', 'center','FontSize', 8, 'Color', 'r');
-
-
+        text(mid_x, mid_y, sprintf('E%d', i), 'VerticalAlignment', 'middle', 'HorizontalAlignment', 'center', 'FontSize', 8, 'Color', 'r');
     end
 
-    % Annotate plot
-    xlabel('x (units)');
-    ylabel('y (units)');
-    title('Graphical Representation of the Structure');
+    xlabel('x (m)');
+    ylabel('y (m)');
+    title('Estructura con Nudos Biarticulados');
     axis equal;
     grid on;
     hold off;
-	saveas(gcf, 'figuras/estructura.png');
+    saveas(gcf, 'figuras/estructura.png');
 
-    % Guardar resultados
     save('preprocessing_data.mat', 'S', 'matrices_k', 'matrices_T', 'matrices_K', 'PROB');
 end
 
-%% ----------------------------- FUNCIONES ----------------------------- %%
+%% Funciones auxiliares
+
 function matrices_k = crea_k(PROB, n_ele)
     matrices_k = zeros(4, 4, n_ele);
 
@@ -101,7 +90,6 @@ function matrices_k = crea_k(PROB, n_ele)
     end
 end
 
-% -------------------------------------------------------------------------
 function matrices_T = crea_T(PROB, n_ele)
     matrices_T = zeros(4, 4, n_ele);
     th = zeros(1, n_ele);
@@ -117,11 +105,9 @@ function matrices_T = crea_T(PROB, n_ele)
                                  -sind(th(ele)),   cosd(th(ele)),   0,               0;
                                   0,               0,               cosd(th(ele)),   sind(th(ele));
                                   0,               0,              -sind(th(ele)),   cosd(th(ele))];
-
     end
 end
 
-% -------------------------------------------------------------------------
 function matrices_K = crea_K(matrices_k, matrices_T, n_ele)
     matrices_K = zeros(4, 4, n_ele);
     for ele = 1:n_ele
