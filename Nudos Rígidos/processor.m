@@ -162,9 +162,14 @@ function processor
     
     disp(' ');
     disp('--- Comprobación de equilibrio ---');
-    disp(['Suma de fuerzas en X: ', num2str(sum_Fx, '%.6e'), ' N']);
-    disp(['Suma de fuerzas en Y: ', num2str(sum_Fy, '%.6e'), ' N']);
-    disp(['Suma de momentos:     ', num2str(sum_M, '%.6e'), ' N·m']);
+    % Redondear valores muy pequeños a cero para mostrar (tolerancia numérica)
+    tol = 1e-6;
+    sum_Fx_display = sum_Fx; if abs(sum_Fx) < tol, sum_Fx_display = 0; end
+    sum_Fy_display = sum_Fy; if abs(sum_Fy) < tol, sum_Fy_display = 0; end
+    sum_M_display = sum_M; if abs(sum_M) < tol, sum_M_display = 0; end
+    disp(['Suma de fuerzas en X: ', num2str(sum_Fx_display, '%.4f'), ' N']);
+    disp(['Suma de fuerzas en Y: ', num2str(sum_Fy_display, '%.4f'), ' N']);
+    disp(['Suma de momentos:     ', num2str(sum_M_display, '%.4f'), ' N·m']);
     
     disp(' ');
     disp('--- Reacciones en los Apoyos ---');
