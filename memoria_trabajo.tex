@@ -400,9 +400,7 @@ Las \textcolor{blue}{\underline{Figuras \ref{fig:estructura_biarticulado}}} y \t
     \item Tres tipos de barra diferenciados por color según su sección transversal
 \end{itemize}
 
-\subsection{Modelo con Nudos Biarticulados}
-
-\subsubsection{Apartado c) Desplazamientos Nodales}
+\subsection{Apartado c) Desplazamientos Nodales}
 
 Se implementó un modelo MEF con 2 GDL por nodo ($u_x$, $u_y$), resultando en un sistema de 48 ecuaciones. Los desplazamientos se calcularon resolviendo:
 
@@ -417,7 +415,7 @@ Se implementó un modelo MEF con 2 GDL por nodo ($u_x$, $u_y$), resultando en un
     \item La deformación es simétrica respecto al eje central
 \end{itemize}
 
-\subsubsection{Apartado d) Reacciones en Apoyos y Verificación del Equilibrio}
+\subsection{Apartado d) Reacciones en Apoyos y Verificación del Equilibrio}
 
 \begin{table}[ht]
 \centering
@@ -442,7 +440,7 @@ Nodo & $R_x$ [N] & $R_y$ [N] \\
 \sum F_y &= 2.0\times10^6 \text{ N} \quad \checkmark \text{ (igual a carga aplicada)}
 \end{align*}
 
-\subsubsection{Apartado e) Estructura Deformada con Escala de Colores}
+\subsection{Apartado e) Estructura Deformada con Escala de Colores}
 
 La \textcolor{blue}{\underline{Figura \ref{fig:deformada_biarticulado}}} muestra:
 \begin{itemize}
@@ -451,7 +449,7 @@ La \textcolor{blue}{\underline{Figura \ref{fig:deformada_biarticulado}}} muestra
     \item Barras en compresión (azul) y tracción (rojo)
 \end{itemize}
 
-\subsubsection{Apartado f) Identificación de Barra Crítica y Verificación de Fallo}
+\subsection{Apartado f) Identificación de Barra Crítica y Verificación de Fallo}
 \textbf{Barra con mayor tensión:} Barra 48 con $\sigma = -55.62$ MPa (compresión)
 
 \textbf{Verificación de fallo:}
@@ -461,9 +459,7 @@ La \textcolor{blue}{\underline{Figura \ref{fig:deformada_biarticulado}}} muestra
     \item \textbf{Conclusión:} Ninguna barra falla (factor de seguridad = 3.78)
 \end{itemize}
 
-\subsection{Modelo con Nudos Rígidos}
-
-\subsubsection{Apartado g) Cálculo de Desplazamientos y Comparación}
+\subsection{Apartado g) Cálculo de Desplazamientos y Comparación}
 
 \textbf{Resultados:}
 \begin{itemize}
@@ -488,7 +484,7 @@ Nudos rígidos & 13.019 & $-0.28$ \\
 La reducción se debe a la rigidez adicional por resistencia a flexión, aunque el efecto es marginal dado que el comportamiento está dominado por esfuerzos axiales.
 
 \newpage
-\subsubsection{Apartado h) Reacciones en Apoyos y Verificación del Equilibrio}
+\subsection{Apartado h) Reacciones en Apoyos y Verificación del Equilibrio}
 
 \begin{table}[ht]
 \centering
@@ -514,7 +510,7 @@ Nodo & $R_x$ [N] & $R_y$ [N] & $M$ [N·m] \\
 \sum M &\approx 0 \text{ N·m} \quad \checkmark
 \end{align*}
 
-\subsubsection{Apartado i) Estructura Deformada con Escala de Colores}
+\subsection{Apartado i) Estructura Deformada con Escala de Colores}
 
 La \textcolor{blue}{\underline{Figura \ref{fig:deformada_rigido}}} muestra:
 \begin{itemize}
@@ -523,7 +519,7 @@ La \textcolor{blue}{\underline{Figura \ref{fig:deformada_rigido}}} muestra:
     \item Distribución similar al modelo biarticulado con pequeñas variaciones
 \end{itemize}
 
-\subsubsection{Apartado j) Identificación de Barra Crítica y Verificación de Fallo}
+\subsection{Apartado j) Identificación de Barra Crítica y Verificación de Fallo}
 \textbf{Barra con mayor tensión:} Barra 48 con $\sigma_{total} = -55.04$ MPa (compresión)
 
 \textbf{Verificación de fallo:}
@@ -601,6 +597,5 @@ Nudos rígidos & 48 & $-55.04$ & $-1.04$ \\
     
     \item Los resultados han sido validados mediante verificación de equilibrio estático y simetría.
     
-    \item Todos los apartados del enunciado (a-j) han sido completados satisfactoriamente, totalizando 10 puntos.
 \end{enumerate}
 \end{document}

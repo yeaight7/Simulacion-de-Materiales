@@ -26,11 +26,11 @@ function preprocessor(file)
 
     disp(S);
 
-    % Extract data
+    % extraer datos
     nodes = PROB.nodos;          
     ele = PROB.miembros;   
 
-    % Initialize figure
+    % Representación gráfica
     figure;
     hold on;
 
