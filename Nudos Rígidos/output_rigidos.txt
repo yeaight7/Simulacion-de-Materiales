@@ -1,0 +1,133 @@
+==========================================================
+   ANÁLISIS ESTRUCTURAL - NUDOS RÍGIDOS
+==========================================================
+
+--- Paso 1: Lectura de input ---
+Lectura de input completada
+
+--- Paso 2: Preprocesamiento ---
+Número de nodos: 24
+Número de elementos: 51
+Grados de libertad totales: 72
+Preprocesamiento completado
+
+--- Paso 3: Procesamiento ---
+
+========================================
+    RESULTADOS - NUDOS RÍGIDOS
+========================================
+
+--- Desplazamientos nodales (d) ---
+Formato: [dx, dy, θ] por nodo
+Nodo  1: dx = 0.000000e+00 m, dy = 0.000000e+00 m, θ = 0.000000e+00 rad
+Nodo  2: dx = 0.000000e+00 m, dy = 0.000000e+00 m, θ = 0.000000e+00 rad
+Nodo  3: dx = -9.266524e-04 m, dy = -6.315407e-03 m, θ = -9.937947e-04 rad
+Nodo  4: dx = -8.009386e-04 m, dy = -1.110927e-02 m, θ = -5.786123e-04 rad
+Nodo  5: dx = 2.922603e-18 m, dy = -1.301881e-02 m, θ = 1.381646e-18 rad
+Nodo  6: dx = 8.009386e-04 m, dy = -1.110927e-02 m, θ = 5.786123e-04 rad
+Nodo  7: dx = 9.266524e-04 m, dy = -6.315407e-03 m, θ = 9.937947e-04 rad
+Nodo  8: dx = 0.000000e+00 m, dy = 0.000000e+00 m, θ = 0.000000e+00 rad
+Nodo  9: dx = 0.000000e+00 m, dy = 0.000000e+00 m, θ = 0.000000e+00 rad
+Nodo 10: dx = 3.639516e-04 m, dy = 4.511913e-04 m, θ = -2.774910e-04 rad
+Nodo 11: dx = 1.432028e-03 m, dy = -2.882379e-03 m, θ = -8.497455e-04 rad
+Nodo 12: dx = 6.754161e-04 m, dy = -8.852658e-03 m, θ = -7.046325e-04 rad
+Nodo 13: dx = 2.371646e-04 m, dy = -1.265028e-02 m, θ = -2.793601e-04 rad
+Nodo 14: dx = -2.371646e-04 m, dy = -1.265028e-02 m, θ = 2.793601e-04 rad
+Nodo 15: dx = -6.754161e-04 m, dy = -8.852658e-03 m, θ = 7.046325e-04 rad
+Nodo 16: dx = -1.432028e-03 m, dy = -2.882379e-03 m, θ = 8.497455e-04 rad
+Nodo 17: dx = -3.639516e-04 m, dy = 4.511913e-04 m, θ = 2.774910e-04 rad
+Nodo 18: dx = 2.401805e-03 m, dy = -1.189114e-03 m, θ = -5.904159e-04 rad
+Nodo 19: dx = 2.841648e-03 m, dy = -5.734176e-03 m, θ = -8.645881e-04 rad
+Nodo 20: dx = 1.733155e-03 m, dy = -1.071087e-02 m, θ = -5.966602e-04 rad
+Nodo 21: dx = -3.268296e-18 m, dy = -1.259973e-02 m, θ = 1.907226e-18 rad
+Nodo 22: dx = -1.733155e-03 m, dy = -1.071087e-02 m, θ = 5.966602e-04 rad
+Nodo 23: dx = -2.841648e-03 m, dy = -5.734176e-03 m, θ = 8.645881e-04 rad
+Nodo 24: dx = -2.401805e-03 m, dy = -1.189114e-03 m, θ = 5.904159e-04 rad
+
+--- Tensiones en los elementos ---
+Elemento  1: σ = 0.000000e+00 Pa
+Elemento  2: σ = -2.886377e+07 Pa
+Elemento  3: σ = 4.368676e+06 Pa
+Elemento  4: σ = 2.603935e+07 Pa
+Elemento  5: σ = 2.603935e+07 Pa
+Elemento  6: σ = 4.368676e+06 Pa
+Elemento  7: σ = -2.886377e+07 Pa
+Elemento  8: σ = 0.000000e+00 Pa
+Elemento  9: σ = 2.288110e+07 Pa
+Elemento 10: σ = 1.579148e+05 Pa
+Elemento 11: σ = -3.770593e+07 Pa
+Elemento 12: σ = -2.646742e+07 Pa
+Elemento 13: σ = 1.232100e+07 Pa
+Elemento 14: σ = 1.871643e+07 Pa
+Elemento 15: σ = -1.304883e+07 Pa
+Elemento 16: σ = 1.041875e+07 Pa
+Elemento 17: σ = 1.277965e+07 Pa
+Elemento 18: σ = -5.791940e+06 Pa
+Elemento 19: σ = 2.052633e+06 Pa
+Elemento 20: σ = 1.341069e+07 Pa
+Elemento 21: σ = 2.052633e+06 Pa
+Elemento 22: σ = -5.791940e+06 Pa
+Elemento 23: σ = 1.277965e+07 Pa
+Elemento 24: σ = 1.041875e+07 Pa
+Elemento 25: σ = -1.304883e+07 Pa
+Elemento 26: σ = 1.871643e+07 Pa
+Elemento 27: σ = 1.232100e+07 Pa
+Elemento 28: σ = -2.646742e+07 Pa
+Elemento 29: σ = -3.770593e+07 Pa
+Elemento 30: σ = 1.579148e+05 Pa
+Elemento 31: σ = 2.288110e+07 Pa
+Elemento 32: σ = 2.296750e+07 Pa
+Elemento 33: σ = 1.226644e+07 Pa
+Elemento 34: σ = -2.715612e+07 Pa
+Elemento 35: σ = 1.047301e+07 Pa
+Elemento 36: σ = -1.326828e+07 Pa
+Elemento 37: σ = 2.049681e+06 Pa
+Elemento 38: σ = -5.889886e+06 Pa
+Elemento 39: σ = -5.889886e+06 Pa
+Elemento 40: σ = 2.049681e+06 Pa
+Elemento 41: σ = -1.326828e+07 Pa
+Elemento 42: σ = 1.047301e+07 Pa
+Elemento 43: σ = -2.715612e+07 Pa
+Elemento 44: σ = 1.226644e+07 Pa
+Elemento 45: σ = 2.296750e+07 Pa
+Elemento 46: σ = 1.431738e+07 Pa
+Elemento 47: σ = -3.522316e+07 Pa
+Elemento 48: σ = -5.503935e+07 Pa
+Elemento 49: σ = -5.503935e+07 Pa
+Elemento 50: σ = -3.522316e+07 Pa
+Elemento 51: σ = 1.431738e+07 Pa
+
+Barra 48 tiene la máxima tensión: -5.503935e+07 Pa
+  (Valor absoluto: 5.503935e+07 Pa)
+
+--- Barras fallidas ---
+Ninguna barra falló.
+
+--- Comprobación de equilibrio ---
+Suma de fuerzas en X: 0.0000 N
+Suma de fuerzas en Y: 0.0000 N
+Suma de momentos:     0.0000 N·m
+
+--- Reacciones en los Apoyos ---
+Nodo 1: Rx = -4.482e+05 N, Ry = -2.349e+05 N, M = -1.529e+03 N·m
+Nodo 2: Rx = 9.824e+05 N, Ry = 1.235e+06 N, M = 1.145e+04 N·m
+Nodo 8: Rx = -9.824e+05 N, Ry = 1.235e+06 N, M = -1.145e+04 N·m
+Nodo 9: Rx = 4.482e+05 N, Ry = -2.349e+05 N, M = 1.529e+03 N·m
+========================================
+Procesamiento completado
+
+--- Paso 4: Postprocesamiento ---
+
+========================================
+    RESUMEN POSTPROCESAMIENTO
+========================================
+Escala de deformación: ×500
+Tensión mínima: -55.04 MPa
+Tensión máxima: 26.04 MPa
+Número de barras fallidas: 0
+========================================
+Postprocesamiento completado
+
+==========================================================
+   SIMULACIÓN COMPLETADA CORRECTAMENTE
+==========================================================

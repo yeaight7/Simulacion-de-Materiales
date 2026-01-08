@@ -1,0 +1,130 @@
+==========================================================
+   ANÁLISIS ESTRUCTURAL - NUDOS BIARTICULADOS
+==========================================================
+
+--- Paso 1: Lectura de input ---
+Lectura de input completada
+
+--- Paso 2: Preprocesamiento ---
+Número de nodos: 24
+Número de elementos: 51
+Grados de libertad totales: 48
+Preprocesamiento completado
+
+--- Paso 3: Procesamiento ---
+
+========================================
+    RESULTADOS - NUDOS BIARTICULADOS
+========================================
+
+--- Desplazamientos nodales (d) ---
+Formato: [dx, dy] por nodo
+Nodo  1: dx = 0.000000e+00 m, dy = 0.000000e+00 m
+Nodo  2: dx = 0.000000e+00 m, dy = 0.000000e+00 m
+Nodo  3: dx = -9.266761e-04 m, dy = -6.339165e-03 m
+Nodo  4: dx = -8.018404e-04 m, dy = -1.114124e-02 m
+Nodo  5: dx = -4.212383e-18 m, dy = -1.305522e-02 m
+Nodo  6: dx = 8.018404e-04 m, dy = -1.114124e-02 m
+Nodo  7: dx = 9.266761e-04 m, dy = -6.339165e-03 m
+Nodo  8: dx = 0.000000e+00 m, dy = 0.000000e+00 m
+Nodo  9: dx = 0.000000e+00 m, dy = 0.000000e+00 m
+Nodo 10: dx = 3.636516e-04 m, dy = 4.545645e-04 m
+Nodo 11: dx = 1.441484e-03 m, dy = -2.895411e-03 m
+Nodo 12: dx = 6.780665e-04 m, dy = -8.880430e-03 m
+Nodo 13: dx = 2.385004e-04 m, dy = -1.268674e-02 m
+Nodo 14: dx = -2.385004e-04 m, dy = -1.268674e-02 m
+Nodo 15: dx = -6.780665e-04 m, dy = -8.880430e-03 m
+Nodo 16: dx = -1.441484e-03 m, dy = -2.895411e-03 m
+Nodo 17: dx = -3.636516e-04 m, dy = 4.545645e-04 m
+Nodo 18: dx = 2.412788e-03 m, dy = -1.197727e-03 m
+Nodo 19: dx = 2.851988e-03 m, dy = -5.752098e-03 m
+Nodo 20: dx = 1.738533e-03 m, dy = -1.074135e-02 m
+Nodo 21: dx = -4.070432e-18 m, dy = -1.263369e-02 m
+Nodo 22: dx = -1.738533e-03 m, dy = -1.074135e-02 m
+Nodo 23: dx = -2.851988e-03 m, dy = -5.752098e-03 m
+Nodo 24: dx = -2.412788e-03 m, dy = -1.197727e-03 m
+
+--- Tensiones en los elementos ---
+Elemento  1: σ = 0.000000e+00 Pa
+Elemento  2: σ = -2.955075e+07 Pa
+Elemento  3: σ = 4.053774e+06 Pa
+Elemento  4: σ = 2.566827e+07 Pa
+Elemento  5: σ = 2.566827e+07 Pa
+Elemento  6: σ = 4.053774e+06 Pa
+Elemento  7: σ = -2.955075e+07 Pa
+Elemento  8: σ = 0.000000e+00 Pa
+Elemento  9: σ = 2.270613e+07 Pa
+Elemento 10: σ = 1.692704e+03 Pa
+Elemento 11: σ = -3.830863e+07 Pa
+Elemento 12: σ = -2.726230e+07 Pa
+Elemento 13: σ = 1.216385e+07 Pa
+Elemento 14: σ = 1.883186e+07 Pa
+Elemento 15: σ = -1.332578e+07 Pa
+Elemento 16: σ = 1.029937e+07 Pa
+Elemento 17: σ = 1.281726e+07 Pa
+Elemento 18: σ = -6.103592e+06 Pa
+Elemento 19: σ = 1.757999e+06 Pa
+Elemento 20: σ = 1.348896e+07 Pa
+Elemento 21: σ = 1.757999e+06 Pa
+Elemento 22: σ = -6.103592e+06 Pa
+Elemento 23: σ = 1.281726e+07 Pa
+Elemento 24: σ = 1.029937e+07 Pa
+Elemento 25: σ = -1.332578e+07 Pa
+Elemento 26: σ = 1.883186e+07 Pa
+Elemento 27: σ = 1.216385e+07 Pa
+Elemento 28: σ = -2.726230e+07 Pa
+Elemento 29: σ = -3.830863e+07 Pa
+Elemento 30: σ = 1.692704e+03 Pa
+Elemento 31: σ = 2.270613e+07 Pa
+Elemento 32: σ = 2.273905e+07 Pa
+Elemento 33: σ = 1.209572e+07 Pa
+Elemento 34: σ = -2.726386e+07 Pa
+Elemento 35: σ = 1.033539e+07 Pa
+Elemento 36: σ = -1.334799e+07 Pa
+Elemento 37: σ = 1.787180e+06 Pa
+Elemento 38: σ = -6.120632e+06 Pa
+Elemento 39: σ = -6.120632e+06 Pa
+Elemento 40: σ = 1.787180e+06 Pa
+Elemento 41: σ = -1.334799e+07 Pa
+Elemento 42: σ = 1.033539e+07 Pa
+Elemento 43: σ = -2.726386e+07 Pa
+Elemento 44: σ = 1.209572e+07 Pa
+Elemento 45: σ = 2.273905e+07 Pa
+Elemento 46: σ = 1.410750e+07 Pa
+Elemento 47: σ = -3.556681e+07 Pa
+Elemento 48: σ = -5.562390e+07 Pa
+Elemento 49: σ = -5.562390e+07 Pa
+Elemento 50: σ = -3.556681e+07 Pa
+Elemento 51: σ = 1.410750e+07 Pa
+
+--- Reacciones en los Apoyos ---
+Nodo 1: Rx = -4.504e+05 N, Ry = -2.353e+05 N
+Nodo 2: Rx = 9.865e+05 N, Ry = 1.235e+06 N
+Nodo 8: Rx = -9.865e+05 N, Ry = 1.235e+06 N
+Nodo 9: Rx = 4.504e+05 N, Ry = -2.353e+05 N
+
+--- Comprobación de equilibrio ---
+Suma de fuerzas en X: 0.0000 N
+Suma de fuerzas en Y: 0.0000 N
+
+--- Máxima tensión y comprobación ---
+Barra 48 tiene la máxima tensión de -5.562390e+07 Pa
+Barras fallidas: Ninguna barra falló.
+========================================
+Procesamiento completado
+
+--- Paso 4: Postprocesamiento ---
+
+========================================
+    RESUMEN POSTPROCESAMIENTO
+========================================
+Escala de deformación: ×100
+Tensión mínima: -55.62 MPa
+Tensión máxima: 25.67 MPa
+Número de barras fallidas: 0
+========================================
+Postprocesamiento completado
+
+==========================================================
+   SIMULACIÓN COMPLETADA CORRECTAMENTE
+==========================================================

@@ -2,12 +2,11 @@ clc;
 clear all;
 
 % Abrir archivo para guardar resultados
-output_file = 'output_resultados.txt';
+output_file = 'output_biarticulados.txt';
 fid = fopen(output_file, 'w');
 
 fprintf(fid, '==========================================================\n');
 fprintf(fid, '   ANÁLISIS ESTRUCTURAL - NUDOS BIARTICULADOS\n');
-fprintf(fid, '   Fecha: %s\n', datestr(now, 'dd/mm/yyyy HH:MM:SS'));
 fprintf(fid, '==========================================================\n\n');
 
 %% Paso 1 y 2: Lectura de input y Preprocesamiento
