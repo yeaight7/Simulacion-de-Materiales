@@ -24,7 +24,8 @@ function preprocessor(file)
         S(gdl, gdl) = S(gdl, gdl) + matrices_K(:, :, ele);
     end
 
-    disp(S);
+    disp('Matriz S:');
+    S
 
     % extraer datos
     nodes = PROB.nodos;          
