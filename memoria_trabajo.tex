@@ -90,7 +90,7 @@ La estructura analizada consiste en una cercha reticulada plana compuesta por:
     \item \textbf{Altura total:} \SI{5}{m}
 \end{itemize}
 
-La visualización gráfica detallada de la estructura, incluyendo la numeración de nodos y barras, se presenta en las Figuras \ref{fig:estructura_biarticulado} y \ref{fig:estructura_rigido} correspondientes a cada modelo analizado.
+La visualización gráfica detallada de la estructura, incluyendo la numeración de nodos y barras, se presenta en las \textcolor{blue}{\underline{Figuras \ref{fig:estructura_biarticulado}}} y \textcolor{blue}{\underline{\ref{fig:estructura_rigido}}} correspondientes a cada modelo analizado.
 
 \subsection{Condiciones de Contorno}
 
@@ -122,6 +122,9 @@ Nodos & Fuerza vertical [N] \\
 \end{tabular}
 \caption{Cargas aplicadas en la estructura.}
 \end{table}
+
+La oración \textit{"sobre la que actúa una carga vertical con sentido descendente de 2 MN, que se reparte uniformemente"} es un poco ambigua y se puede interpretar de distintas formas. Sin embargo, se ha optado por este enfoque.
+La carga total de 2 MN se modela como carga uniforme sobre las barras inferiores y se discretiza en cargas nodales, resultando 125 kN en los nodos extremos y 250 kN en los interiores.
 
 \subsection{Propiedades de los Materiales}
 
@@ -392,7 +395,7 @@ La estructura analizada es una cercha reticulada plana con:
     \item Dimensiones: 50 m × 5 m
 \end{itemize}
 
-Las Figuras \ref{fig:estructura_biarticulado} y \ref{fig:estructura_rigido} muestran la representación gráfica con:
+Las \textcolor{blue}{\underline{Figuras \ref{fig:estructura_biarticulado}}} y \textcolor{blue}{\underline{\ref{fig:estructura_rigido}}} muestran la representación gráfica con:
 \begin{itemize}
     \item Identificación de todos los nodos (1-24)
     \item Elementos numerados (barras 1-51)
@@ -443,7 +446,7 @@ Nodo & $R_x$ [N] & $R_y$ [N] \\
 
 \subsubsection{Apartado e) Estructura Deformada con Escala de Colores}
 
-La Figura \ref{fig:deformada_biarticulado} muestra:
+La \textcolor{blue}{\underline{Figura \ref{fig:deformada_biarticulado}}} muestra:
 \begin{itemize}
     \item Estructura deformada con escala amplificada para visualización
     \item Escala de colores representando la tensión axial en cada barra
@@ -463,8 +466,6 @@ La Figura \ref{fig:deformada_biarticulado} muestra:
 \subsection{Modelo con Nudos Rígidos}
 
 \subsubsection{Apartado g) Cálculo de Desplazamientos y Comparación}
-
-Se implementó un modelo MEF tipo viga de Euler-Bernoulli con 3 GDL por nodo ($u_x$, $u_y$, $\theta$), resultando en un sistema de 72 ecuaciones.
 
 \textbf{Resultados:}
 \begin{itemize}
@@ -516,7 +517,7 @@ Nodo & $R_x$ [N] & $R_y$ [N] & $M$ [N·m] \\
 
 \subsubsection{Apartado i) Estructura Deformada con Escala de Colores}
 
-La Figura \ref{fig:deformada_rigido} muestra:
+La \textcolor{blue}{\underline{Figura \ref{fig:deformada_rigido}}} muestra:
 \begin{itemize}
     \item Estructura deformada con escala amplificada
     \item Escala de colores para tensión total (axial + flexión)
