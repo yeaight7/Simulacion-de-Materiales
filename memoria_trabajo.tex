@@ -126,6 +126,7 @@ Nodos & Fuerza vertical [N] \\
 La oración \textit{"sobre la que actúa una carga vertical con sentido descendente de 2 MN, que se reparte uniformemente"} es un poco ambigua y se puede interpretar de distintas formas. Sin embargo, se ha optado por este enfoque.
 La carga total de 2 MN se modela como carga uniforme sobre las barras inferiores y se discretiza en cargas nodales, resultando 125 kN en los nodos extremos y 250 kN en los interiores.
 
+\newpage
 \subsection{Propiedades de los Materiales}
 
 La estructura está compuesta por tres tipos de materiales con las siguientes propiedades:
@@ -339,7 +340,6 @@ Este módulo resuelve el sistema de ecuaciones:
 \begin{enumerate}
     \item Ensamblaje del vector de fuerzas nodales
     \item Identificación de grados de libertad prescritos y libres
-    \item Partición de la matriz de rigidez global
     \item Resolución del sistema para obtener desplazamientos
     \item Cálculo de tensiones en cada elemento
     \item Verificación del criterio de fallo (tensión > límite elástico)
@@ -354,8 +354,6 @@ El postprocesamiento genera:
     \item Visualización de la estructura deformada con escala amplificada
     \item Mapa de colores representando la distribución de tensiones
     \item Identificación visual de barras fallidas
-    \item Exportación de resultados numéricos
-    \item Generación de gráficos para el análisis
 \end{enumerate}
 
 \subsection{Salida del Programa}
@@ -489,6 +487,7 @@ Nudos rígidos & 13.019 & $-0.28$ \\
 
 La reducción se debe a la rigidez adicional por resistencia a flexión, aunque el efecto es marginal dado que el comportamiento está dominado por esfuerzos axiales.
 
+\newpage
 \subsubsection{Apartado h) Reacciones en Apoyos y Verificación del Equilibrio}
 
 \begin{table}[ht]
