@@ -131,10 +131,14 @@ function processor
     disp('--- Comprobación de equilibrio ---');
     % Redondear valores muy pequeños a cero para mostrar (tolerancia numérica)
     tol = 1e-6;
-    sum_Fx_display = sum_Fx; if abs(sum_Fx) < tol, sum_Fx_display = 0; end
-    sum_Fy_display = sum_Fy; if abs(sum_Fy) < tol, sum_Fy_display = 0; end
-    disp(['Suma de fuerzas en X: ', num2str(sum_Fx_display, '%.4f'), ' N']);
-    disp(['Suma de fuerzas en Y: ', num2str(sum_Fy_display, '%.4f'), ' N']);
+    if abs(sum_Fx) < tol 
+        sum_Fx_mostrar = 0; 
+    end
+    if abs(sum_Fy) < tol 
+        sum_Fy_mostrar = 0; 
+    end
+    disp(['Suma de fuerzas en X: ', num2str(sum_Fx_mostrar, '%.4f'), ' N']);
+    disp(['Suma de fuerzas en Y: ', num2str(sum_Fy_mostrar, '%.4f'), ' N']);
     
     % identificar barra con mayor tensión y comprobar barras fallidas
     maximo = 0;
