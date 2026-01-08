@@ -1,4 +1,4 @@
-function postprocessor
+function postprocessor(fid)
     
     % Cargar datos del procesamiento
     load('processing_data.mat', 'd', 'tensiones', 'barras_fallidas', 'reacciones', 'p', 'r');
@@ -49,7 +49,7 @@ function postprocessor
         color_index = round(tension_norm * (size(cmap, 1) - 1)) + 1;
         color = cmap(color_index,:);
     
-        % Dibujar barra original (negro)
+        % Dibujar barra original (línea discontinua)
         plot(x_original, y_original, 'w--', 'LineWidth', 1.0);
     
         % Dibujar barra deformada con color
@@ -60,14 +60,41 @@ function postprocessor
     cmap = colormap("jet");
     colorbar; % Mostrar barra de color
     clim([min_tension, max_tension]); % Escalar colores según el rango de tensiones
-    title('Distribución de Tensiones en la Estructura');
+    title(sprintf('Estructura Deformada - Nudos Biarticulados (escala ×%d)', escala));
     xlabel('X (m)');
-    ylabel('Y (m) * 0.01');
-    legend('Original', 'Deformada (colores por tensión)');
+    ylabel('Y (m)');
+    legend('Original', 'Deformada', 'Location', 'best');
     axis equal;
     grid on;
     hold off;
-	saveas(gcf, 'figuras/deformada.png');
-
+    saveas(gcf, 'figuras/deformada.png');
+    
+    % Resumen
+    disp(' ');
+    disp(repmat('=', 1, 40));
+    disp('    RESUMEN POSTPROCESAMIENTO');
+    disp(repmat('=', 1, 40));
+    disp(['Escala de deformación: ×', num2str(escala)]);
+    disp(['Tensión mínima: ', num2str(min_tension/1e6, '%.2f'), ' MPa']);
+    disp(['Tensión máxima: ', num2str(max_tension/1e6, '%.2f'), ' MPa']);
+    disp(['Número de barras fallidas: ', num2str(length(barras_fallidas))]);
+    if ~isempty(barras_fallidas)
+        disp(['Barras fallidas: ', num2str(barras_fallidas)]);
+    end
+    disp(repmat('=', 1, 40));
+    
+    % Escribir resumen en archivo
+    fprintf(fid, '\n');
+    fprintf(fid, '%s\n', repmat('=', 1, 40));
+    fprintf(fid, '    RESUMEN POSTPROCESAMIENTO\n');
+    fprintf(fid, '%s\n', repmat('=', 1, 40));
+    fprintf(fid, 'Escala de deformación: ×%d\n', escala);
+    fprintf(fid, 'Tensión mínima: %.2f MPa\n', min_tension/1e6);
+    fprintf(fid, 'Tensión máxima: %.2f MPa\n', max_tension/1e6);
+    fprintf(fid, 'Número de barras fallidas: %d\n', length(barras_fallidas));
+    if ~isempty(barras_fallidas)
+        fprintf(fid, 'Barras fallidas: %s\n', num2str(barras_fallidas));
+    end
+    fprintf(fid, '%s\n', repmat('=', 1, 40));
 end
 

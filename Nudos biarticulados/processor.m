@@ -1,4 +1,4 @@
-function processor    
+function processor(fid)    
     load('preprocessing_data.mat', 'S', 'PROB');
     
     % Número de nodos y elementos
@@ -51,8 +51,8 @@ function processor
         tipo_seccion = PROB.miembros(ele, 4);
     
         % Propiedades del material y la sección
-        E = PROB.material(tipo_material);
-        A = PROB.seccion(tipo_seccion);
+        E = PROB.material(tipo_material);  % Módulo de Young
+        A = PROB.seccion(tipo_seccion);    % Área
     
         % Coordenadas de los nodos
         x1 = PROB.nodos(nodo1, 1);
@@ -111,12 +111,34 @@ function processor
     
     % Mostrar resultados principales
     disp(' ');
-    disp('--- Resultados ---');
-    disp('Desplazamientos nodales (d):');
-    disp(reshape(d, 2, []).');
+    disp('========================================');
+    disp('    RESULTADOS - NUDOS BIARTICULADOS');
+    disp('========================================');
+    
+    fprintf(fid, '\n========================================\n');
+    fprintf(fid, '    RESULTADOS - NUDOS BIARTICULADOS\n');
+    fprintf(fid, '========================================\n');
+    
     disp(' ');
-    disp('Tensiones en los elementos:');
+    disp('--- Desplazamientos nodales (d) ---');
+    disp('Formato: [dx, dy] por nodo');
+    disp(reshape(d, 2, []).');
+    
+    fprintf(fid, '\n--- Desplazamientos nodales (d) ---\n');
+    fprintf(fid, 'Formato: [dx, dy] por nodo\n');
+    d_reshaped = reshape(d, 2, []).';
+    for i = 1:n_nodos
+        fprintf(fid, 'Nodo %2d: dx = %12.6e m, dy = %12.6e m\n', i, d_reshaped(i,1), d_reshaped(i,2));
+    end
+    
+    disp(' ');
+    disp('--- Tensiones en los elementos ---');
     disp(tensiones');
+    
+    fprintf(fid, '\n--- Tensiones en los elementos ---\n');
+    for i = 1:n_elementos
+        fprintf(fid, 'Elemento %2d: σ = %12.6e Pa\n', i, tensiones(i));
+    end
     
     % Cálculo de las reacciones en los apoyos
     r = S * d - p;
@@ -125,12 +147,23 @@ function processor
     disp(' ');
     disp('--- Reacciones en los Apoyos ---');
     disp(r);
+    
+    fprintf(fid, '\n--- Reacciones en los Apoyos ---\n');
+    for i = 1:size(PROB.soportes, 1)
+        nodo = PROB.soportes(i, 1);
+        rx = r(2*nodo-1);
+        ry = r(2*nodo);
+        fprintf(fid, 'Nodo %d: Rx = %.3e N, Ry = %.3e N\n', nodo, rx, ry);
+    end
 
     % Mostrar resultados de equilibrio
     disp(' ');
     disp('--- Comprobación de equilibrio ---');
+    fprintf(fid, '\n--- Comprobación de equilibrio ---\n');
     % Redondear valores muy pequeños a cero para mostrar (tolerancia numérica)
     tol = 1e-6;
+    sum_Fx_mostrar = sum_Fx;
+    sum_Fy_mostrar = sum_Fy;
     if abs(sum_Fx) < tol 
         sum_Fx_mostrar = 0; 
     end
@@ -140,7 +173,10 @@ function processor
     disp(['Suma de fuerzas en X: ', num2str(sum_Fx_mostrar, '%.4f'), ' N']);
     disp(['Suma de fuerzas en Y: ', num2str(sum_Fy_mostrar, '%.4f'), ' N']);
     
-    % identificar barra con mayor tensión y comprobar barras fallidas
+    fprintf(fid, 'Suma de fuerzas en X: %.4f N\n', sum_Fx_mostrar);
+    fprintf(fid, 'Suma de fuerzas en Y: %.4f N\n', sum_Fy_mostrar);
+    
+    % Identificar barra con mayor tensión y comprobar barras fallidas
     maximo = 0;
     for i = 1:size(tensiones,2)
         if (abs(tensiones(1,i)) > maximo)
@@ -153,14 +189,23 @@ function processor
     disp(' ');
     disp('--- Máxima tensión y comprobación ---')
     max_tension = tension_maxima;
-    disp(['Barra ', num2str(max_bar), ' tiene la máxima tensión de ', num2str(max_tension), ' N']);
+    disp(['Barra ', num2str(max_bar), ' tiene la máxima tensión de ', num2str(max_tension), ' Pa']);
+    
+    fprintf(fid, '\n--- Máxima tensión y comprobación ---\n');
+    fprintf(fid, 'Barra %d tiene la máxima tensión de %.6e Pa\n', max_bar, max_tension);
 
     disp('Barras fallidas:');
+    fprintf(fid, 'Barras fallidas: ');
     if isempty(barras_fallidas)
         disp('Ninguna barra falló.');
+        fprintf(fid, 'Ninguna barra falló.\n');
     else
         disp(barras_fallidas);
+        fprintf(fid, '%s\n', num2str(barras_fallidas));
     end
+    
+    disp('========================================');
+    fprintf(fid, '========================================\n');
 
     % Guardar resultados para el postprocesamiento
     save('processing_data.mat', 'd', 'tensiones', 'barras_fallidas', 'reacciones', 'p', 'r');

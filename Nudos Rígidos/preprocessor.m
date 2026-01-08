@@ -1,4 +1,4 @@
-function preprocessor(file)
+function preprocessor(file, fid)
 
     % Cargar datos
     PROB = read_input(file);
@@ -24,6 +24,11 @@ function preprocessor(file)
 
     disp('Matriz de rigidez global (S) para nudos rígidos:');
     disp(S);
+    
+    % Escribir información en archivo
+    fprintf(fid, 'Número de nodos: %d\n', n_nod);
+    fprintf(fid, 'Número de elementos: %d\n', n_ele);
+    fprintf(fid, 'Grados de libertad totales: %d\n', n_nod * 3);
 
     % Visualización de la estructura
     nodes = PROB.nodos;
@@ -66,7 +71,7 @@ function preprocessor(file)
     axis equal;
     grid on;
     hold off;
-	saveas(gcf, 'figuras/estructura.png');
+    saveas(gcf, 'figuras/estructura.png');
 
     % Guardar resultados
     save('preprocessing_rigidos_data.mat', 'S', 'matrices_k', 'matrices_T', 'matrices_K', 'PROB');

@@ -1,12 +1,12 @@
-function postprocessor
+function postprocessor(fid)
     load('processing_rigidos_data.mat', 'd', 'tensiones', 'barras_fallidas', 'r', 'p');
     load('preprocessing_rigidos_data.mat', 'PROB');
     
-    % elementos y nodos
+    % Número de elementos y nodos
     n_elementos = size(PROB.miembros, 1);
     n_nodos = size(PROB.nodos, 1);
     
-    % Escala
+    % Escala para visualizar la deformación
     escala = 500; 
     
     % Extraer solo desplazamientos x, y (ignorar rotaciones para visualización)
@@ -19,7 +19,7 @@ function postprocessor
     % Calcular posiciones deformadas
     nodos_deformados = PROB.nodos + escala * reshape(d_xy, 2, [])';
     
-    % Obtener el rango de tensiones para la barra colores
+    % Obtener el rango de tensiones para la barra de colores
     min_tension = min(tensiones);
     max_tension = max(tensiones);
     
@@ -31,7 +31,7 @@ function postprocessor
     figure;
     hold on;
     
-    % coloresr según la tensión
+    % Colorear según la tensión
     for ele = 1:n_elementos
         % Nodos de cada elemento
         nodo1 = PROB.miembros(ele, 1);
@@ -54,10 +54,10 @@ function postprocessor
         color_index = round(tension_norm * (size(cmap, 1) - 1)) + 1;
         color = cmap(color_index, :);
     
-        % estructura indeformada
+        % Estructura indeformada
         plot(x_original, y_original, 'w--', 'LineWidth', 1.0);
     
-        % estructura deformada
+        % Estructura deformada
         plot(x_deformado, y_deformado, 'Color', color, 'LineWidth', 2.5);
         
         % Marcar barras fallidas
@@ -82,7 +82,7 @@ function postprocessor
     axis equal;
     grid on;
     hold off;
-	saveas(gcf, 'figuras/deformada.png');
+    saveas(gcf, 'figuras/deformada.png');
     
     % Resumen
     disp(' ');
@@ -97,4 +97,18 @@ function postprocessor
         disp(['Barras fallidas: ', num2str(barras_fallidas)]);
     end
     disp(repmat('=', 1, 40));
+    
+    % Escribir resumen en archivo
+    fprintf(fid, '\n');
+    fprintf(fid, '%s\n', repmat('=', 1, 40));
+    fprintf(fid, '    RESUMEN POSTPROCESAMIENTO\n');
+    fprintf(fid, '%s\n', repmat('=', 1, 40));
+    fprintf(fid, 'Escala de deformación: ×%d\n', escala);
+    fprintf(fid, 'Tensión mínima: %.2f MPa\n', min_tension/1e6);
+    fprintf(fid, 'Tensión máxima: %.2f MPa\n', max_tension/1e6);
+    fprintf(fid, 'Número de barras fallidas: %d\n', length(barras_fallidas));
+    if ~isempty(barras_fallidas)
+        fprintf(fid, 'Barras fallidas: %s\n', num2str(barras_fallidas));
+    end
+    fprintf(fid, '%s\n', repmat('=', 1, 40));
 end
