@@ -1,176 +1,218 @@
 function processor(fid)
     load('preprocessing_rigidos_data.mat', 'S', 'PROB');
     
+    % Número de nodos y elementos
     n_nodos = size(PROB.nodos, 1);
     n_elementos = size(PROB.miembros, 1);
     
-    d = zeros(3 * n_nodos, 1);
-    p = zeros(3 * n_nodos, 1);
+    % Inicializar vectores y matrices
+    d = zeros(3 * n_nodos, 1); % Desplazamientos (3 gdl por nodo)
+    p = zeros(3 * n_nodos, 1); % Fuerzas nodales
     tensiones = zeros(1, n_elementos);
     barras_fallidas = [];
     
+    % Ensamblar vector de fuerzas nodales
     for i = 1:size(PROB.cargas, 1)
         nodo = PROB.cargas(i, 1);
         gdl_x = 3 * nodo - 2;
         gdl_y = 3 * nodo - 1;
-        p(gdl_x) = PROB.cargas(i, 2);
-        p(gdl_y) = PROB.cargas(i, 3);
+        % gdl_theta = 3 * nodo; % Grado de libertad rotacional (momento)
+        
+        p(gdl_x) = PROB.cargas(i, 2); % Fuerza en X
+        p(gdl_y) = PROB.cargas(i, 3); % Fuerza en Y
+        % p(gdl_theta) = 0; % Sin momentos externos aplicados
     end
     
+    % Identificar los grados de libertad con desplazamientos prescritos
+    % Para nudos rígidos: restringir x, y, y θ en cada soporte
     ind_p = [];
     for i = 1:size(PROB.soportes, 1)
         nodo = PROB.soportes(i, 1);
+        % Agregar los 3 GDL del nodo restringido
         ind_p = [ind_p; 3*nodo-2; 3*nodo-1; 3*nodo];
     end
     ind_p = unique(ind_p);
-    dp = zeros(length(ind_p), 1);
+    dp = zeros(length(ind_p), 1); % Desplazamientos prescritos (cero en los apoyos)
     
-    ind_d = setdiff(1:3 * n_nodos, ind_p);
+    % Identificar los grados de libertad libres
+    ind_d = setdiff(1:3 * n_nodos, ind_p); % Grados de libertad libres
     
+    % Submatrices del sistema de ecuaciones
     Spp = S(ind_p, ind_p);
     Spd = S(ind_p, ind_d);
     Sdp = S(ind_d, ind_p);
     Sdd = S(ind_d, ind_d);
     
-    pp = p(ind_p);
-    pd = p(ind_d);
+    pp = p(ind_p); % Fuerzas en grados de libertad restringidos
+    pd = p(ind_d); % Fuerzas en grados de libertad libres
     
+    % Resolver sistema de ecuaciones para desplazamientos libres
     dd = Sdd \ (pd - Sdp * dp);
     
-    d(ind_p) = dp;
-    d(ind_d) = dd;
+    % Actualizar vector de desplazamientos
+    d(ind_p) = dp; % Desplazamientos prescritos
+    d(ind_d) = dd; % Desplazamientos libres calculados
     
+    % Calcular tensiones y verificar fallas
     for ele = 1:n_elementos
         nodo1 = PROB.miembros(ele, 1);
         nodo2 = PROB.miembros(ele, 2);
         tipo_material = PROB.miembros(ele, 3);
         tipo_seccion = PROB.miembros(ele, 4);
     
-        E = PROB.material(tipo_material, 1);
-        Sy = PROB.material(tipo_material, 2);
-        A = PROB.seccion(tipo_seccion, 1);
-        I = PROB.seccion(tipo_seccion, 2);
+        % Propiedades del material y la sección
+        E = PROB.material(tipo_material, 1);  % Módulo de Young
+        Sy = PROB.material(tipo_material, 2); % Tensión de fluencia
+        A = PROB.seccion(tipo_seccion, 1);    % Área
+        I = PROB.seccion(tipo_seccion, 2);    % Momento de inercia
     
+        % Coordenadas de los nodos
         x1 = PROB.nodos(nodo1, 1);
         y1 = PROB.nodos(nodo1, 2);
         x2 = PROB.nodos(nodo2, 1);
         y2 = PROB.nodos(nodo2, 2);
     
+        % Longitud original del elemento
         L_original = sqrt((x2 - x1)^2 + (y2 - y1)^2);
     
-        d1 = [d(3*nodo1-2); d(3*nodo1-1); d(3*nodo1)];
-        d2 = [d(3*nodo2-2); d(3*nodo2-1); d(3*nodo2)];
+        % Desplazamientos de los nodos (ahora con rotación)
+        d1 = [d(3*nodo1-2); d(3*nodo1-1); d(3*nodo1)];     % [dx1, dy1, θ1]
+        d2 = [d(3*nodo2-2); d(3*nodo2-1); d(3*nodo2)];     % [dx2, dy2, θ2]
     
+        % Longitud deformada (solo traslaciones)
         L_deformada = sqrt((x2 - x1 + d2(1) - d1(1))^2 + (y2 - y1 + d2(2) - d1(2))^2);
     
+        % Cálculo de la tensión axial
         delta_L = L_deformada - L_original;
         tension_axial = E * delta_L / L_original;
     
-        theta_avg = abs(d1(3) - d2(3)) / 2;
-        momento_max = E * I * theta_avg / L_original;
+        % Cálculo de la tensión por flexión (aproximada)
+        % Momento máximo en viga simplemente apoyada con deflexión
+        % Usamos una aproximación basada en las rotaciones
+        theta_avg = abs(d1(3) - d2(3)) / 2;  % Rotación promedio
+        momento_max = E * I * theta_avg / L_original;  % Aproximación
         
-        c = sqrt(I / A);
+        % Tensión máxima por flexión: σ = M*c/I, donde c ≈ sqrt(I/A) para secciones típicas
+        c = sqrt(I / A);  % Distancia al eje neutro (aproximada)
         tension_flexion = momento_max * c / I;
     
+        % Tensión total (combinación de axial y flexión)
         tensiones(ele) = tension_axial + tension_flexion;
     
+        % Verificar si la barra falla
         if tensiones(ele) > Sy
             barras_fallidas = [barras_fallidas, ele];
         end
     end
     
+    % Calcular reacciones en los apoyos
     r = S * d - p;
     
+    % Verificar equilibrio de fuerzas
     sum_Fx = 0;
     sum_Fy = 0;
     sum_M = 0;
     
+    % Suma de fuerzas externas
     for i = 1:size(PROB.cargas, 1)
         sum_Fx = sum_Fx + PROB.cargas(i, 2);
         sum_Fy = sum_Fy + PROB.cargas(i, 3);
     end
     
+    % Suma de reacciones en los apoyos
     for i = 1:length(ind_p)
         gdl = ind_p(i);
-        resto = mod(gdl - 1, 3) + 1;
-        if resto == 1
+        resto = mod(gdl - 1, 3) + 1; % Determina si es 1 (X), 2 (Y) o 3 (θ)
+        if resto == 1 % GDL en X (3*n-2: 1, 4, 7, ...)
             sum_Fx = sum_Fx + r(gdl);
-        elseif resto == 2
+        elseif resto == 2 % GDL en Y (3*n-1: 2, 5, 8, ...)
             sum_Fy = sum_Fy + r(gdl);
-        else
+        else % GDL rotacional (3*n: 3, 6, 9, ...)
             sum_M = sum_M + r(gdl);
         end
     end
     
-    % Mostrar resultados en consola
+    % Mostrar resultados
+    disp('========================================');
+    disp('    RESULTADOS - NUDOS RÍGIDOS');
+    disp('========================================');
+    
+    fprintf(fid, '\n========================================\n');
+    fprintf(fid, '    RESULTADOS - NUDOS RÍGIDOS\n');
+    fprintf(fid, '========================================\n');
+    
     disp(' ');
-    disp('----------------------------------------------------------');
-    disp('                    RESULTADOS');
-    disp('----------------------------------------------------------');
+    disp('--- Desplazamientos nodales (d) ---');
+    disp('Formato: [dx, dy, θ] por nodo');
+    disp(reshape(d, 3, []).');
     
-    % Escribir en archivo de texto
-    fprintf(fid, '\n   DESPLAZAMIENTOS NODALES\n');
-    fprintf(fid, '   %-8s %-15s %-15s %-15s\n', 'Nodo', 'dx (m)', 'dy (m)', 'theta (rad)');
-    fprintf(fid, '   %s\n', repmat('-', 1, 55));
-    
+    fprintf(fid, '\n--- Desplazamientos nodales (d) ---\n');
+    fprintf(fid, 'Formato: [dx, dy, θ] por nodo\n');
     d_reshaped = reshape(d, 3, []).';
     for i = 1:n_nodos
-        fprintf(fid, '   %-8d %-15.6e %-15.6e %-15.6e\n', i, d_reshaped(i, 1), d_reshaped(i, 2), d_reshaped(i, 3));
+        fprintf(fid, 'Nodo %2d: dx = %12.6e m, dy = %12.6e m, θ = %12.6e rad\n', i, d_reshaped(i,1), d_reshaped(i,2), d_reshaped(i,3));
     end
     
-    % Encontrar desplazamiento máximo
-    [max_dy, max_nodo] = max(abs(d_reshaped(:, 2)));
-    disp(['   Desplazamiento vertical máximo: ', num2str(max_dy * 1000, '%.3f'), ' mm (Nodo ', num2str(max_nodo), ')']);
-    fprintf(fid, '\n   Desplazamiento vertical máximo: %.3f mm (Nodo %d)\n', max_dy * 1000, max_nodo);
+    disp(' ');
+    disp('--- Tensiones en los elementos ---');
+    disp(tensiones');
     
-    % Tensiones
-    fprintf(fid, '\n   TENSIONES EN ELEMENTOS\n');
-    fprintf(fid, '   %-10s %-20s\n', 'Elemento', 'Tensión (Pa)');
-    fprintf(fid, '   %s\n', repmat('-', 1, 32));
+    fprintf(fid, '\n--- Tensiones en los elementos ---\n');
     for i = 1:n_elementos
-        fprintf(fid, '   %-10d %-20.4e\n', i, tensiones(i));
+        fprintf(fid, 'Elemento %2d: σ = %12.6e Pa\n', i, tensiones(i));
     end
     
+    % Encontrar tensión máxima
     [max_tension, max_bar] = max(abs(tensiones));
-    disp(['   Tensión máxima: ', num2str(tensiones(max_bar)/1e6, '%.2f'), ' MPa (Barra ', num2str(max_bar), ')']);
-    fprintf(fid, '\n   Tensión máxima: %.2f MPa (Barra %d)\n', tensiones(max_bar)/1e6, max_bar);
+    disp(' ');
+    disp(['Barra ', num2str(max_bar), ' tiene la máxima tensión: ', num2str(tensiones(max_bar)), ' Pa']);
+    disp(['  (Valor absoluto: ', num2str(max_tension), ' Pa)']);
     
-    % Barras fallidas
-    fprintf(fid, '\n   VERIFICACIÓN DE FALLO\n');
+    fprintf(fid, '\nBarra %d tiene la máxima tensión: %.6e Pa\n', max_bar, tensiones(max_bar));
+    fprintf(fid, '  (Valor absoluto: %.6e Pa)\n', max_tension);
+    
+    disp(' ');
+    disp('--- Barras fallidas ---');
+    fprintf(fid, '\n--- Barras fallidas ---\n');
     if isempty(barras_fallidas)
-        disp('   Barras fallidas: Ninguna');
-        fprintf(fid, '   Estado: Ninguna barra falló\n');
+        disp('✓ Ninguna barra falló.');
+        fprintf(fid, 'Ninguna barra falló.\n');
     else
-        disp(['   Barras fallidas: ', num2str(barras_fallidas)]);
-        fprintf(fid, '   Barras fallidas: %s\n', num2str(barras_fallidas));
+        disp(['✗ Las siguientes barras fallaron: ', num2str(barras_fallidas)]);
+        fprintf(fid, 'Las siguientes barras fallaron: %s\n', num2str(barras_fallidas));
     end
     
-    % Equilibrio
+    disp(' ');
+    disp('--- Comprobación de equilibrio ---');
+    fprintf(fid, '\n--- Comprobación de equilibrio ---\n');
+    % Redondear valores muy pequeños a cero para mostrar (tolerancia numérica)
     tol = 1e-6;
     sum_Fx_display = sum_Fx; if abs(sum_Fx) < tol, sum_Fx_display = 0; end
     sum_Fy_display = sum_Fy; if abs(sum_Fy) < tol, sum_Fy_display = 0; end
     sum_M_display = sum_M; if abs(sum_M) < tol, sum_M_display = 0; end
+    disp(['Suma de fuerzas en X: ', num2str(sum_Fx_display, '%.4f'), ' N']);
+    disp(['Suma de fuerzas en Y: ', num2str(sum_Fy_display, '%.4f'), ' N']);
+    disp(['Suma de momentos:     ', num2str(sum_M_display, '%.4f'), ' N·m']);
     
-    fprintf(fid, '\n   VERIFICACIÓN DE EQUILIBRIO\n');
-    fprintf(fid, '   Suma Fx: %.4f N\n', sum_Fx_display);
-    fprintf(fid, '   Suma Fy: %.4f N\n', sum_Fy_display);
-    fprintf(fid, '   Suma M:  %.4f N·m\n', sum_M_display);
+    fprintf(fid, 'Suma de fuerzas en X: %.4f N\n', sum_Fx_display);
+    fprintf(fid, 'Suma de fuerzas en Y: %.4f N\n', sum_Fy_display);
+    fprintf(fid, 'Suma de momentos:     %.4f N·m\n', sum_M_display);
     
-    disp(['   Equilibrio: Fx = ', num2str(sum_Fx_display, '%.4f'), ' N, Fy = ', num2str(sum_Fy_display, '%.4f'), ' N']);
-    
-    % Reacciones en los apoyos
-    fprintf(fid, '\n   REACCIONES EN APOYOS\n');
-    fprintf(fid, '   %-8s %-18s %-18s %-18s\n', 'Nodo', 'Rx (N)', 'Ry (N)', 'M (N·m)');
-    fprintf(fid, '   %s\n', repmat('-', 1, 65));
+    disp(' ');
+    disp('--- Reacciones en los Apoyos ---');
+    fprintf(fid, '\n--- Reacciones en los Apoyos ---\n');
     for i = 1:size(PROB.soportes, 1)
         nodo = PROB.soportes(i, 1);
         rx = r(3*nodo-2);
         ry = r(3*nodo-1);
         rm = r(3*nodo);
-        fprintf(fid, '   %-8d %-18.4e %-18.4e %-18.4e\n', nodo, rx, ry, rm);
+        disp(['Nodo ', num2str(nodo), ': Rx = ', num2str(rx, '%.3e'), ' N, Ry = ', num2str(ry, '%.3e'), ' N, M = ', num2str(rm, '%.3e'), ' N·m']);
+        fprintf(fid, 'Nodo %d: Rx = %.3e N, Ry = %.3e N, M = %.3e N·m\n', nodo, rx, ry, rm);
     end
     
-    disp('----------------------------------------------------------');
+    disp('========================================');
+    fprintf(fid, '========================================\n');
     
+    % Guardar resultados para el postprocesamiento
     save('processing_rigidos_data.mat', 'd', 'tensiones', 'barras_fallidas', 'r', 'p');
 end

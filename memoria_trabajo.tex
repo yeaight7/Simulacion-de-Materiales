@@ -358,27 +358,52 @@ El postprocesamiento genera:
 
 \subsection{Salida del Programa}
 
-La ejecución del programa principal \texttt{main.m} genera la siguiente salida por consola:
+La ejecución del programa principal \texttt{main.m} genera la siguiente salida por consola y guarda los resultados en un archivo de texto (\texttt{output\_resultados.txt}):
 
-\begin{lstlisting}[caption=Salida de consola del programa]
+\begin{lstlisting}[caption=Estructura de la salida del programa]
 --- Paso 1: Lectura de input ---
 Lectura de input completada
+
 --- Paso 2: Preprocesamiento ---
-% < Matriz de rigidez global S > < Se muestra la figura de los apartados a y b >
-% ...
+Matriz de rigidez global (S): [72x72 double]
+Numero de nodos: 24
+Numero de elementos: 51
 Preprocesamiento completado
+
 --- Paso 3: Procesamiento ---
-% < Resultados >
-% desplazamientos
-% ...
+========================================
+    RESULTADOS - NUDOS RIGIDOS
+========================================
+--- Desplazamientos nodales (d) ---
+[Tabla de desplazamientos por nodo]
+--- Tensiones en los elementos ---
+[Tabla de tensiones por elemento]
+--- Barras fallidas ---
+Ninguna barra fallo.
+--- Comprobacion de equilibrio ---
+Suma de fuerzas en X: 0.0000 N
+Suma de fuerzas en Y: 0.0000 N
+--- Reacciones en los Apoyos ---
+[Tabla de reacciones por nodo]
+========================================
 Procesamiento completado
+
 --- Paso 4: Postprocesamiento ---
-% < Se muestra la estructura deformada y las tensiones >
+========================================
+    RESUMEN POSTPROCESAMIENTO
+========================================
+Escala de deformacion: x500
+Tension minima: -55.04 MPa
+Tension maxima: 21.71 MPa
+Numero de barras fallidas: 0
+========================================
 Postprocesamiento completado
+
 --- Simulacion completada correctamente ---
+Resultados guardados en: output_resultados.txt
 \end{lstlisting}
 
-Esta salida confirma que todos los módulos se ejecutan secuencialmente sin errores, validando la correcta implementación del programa.
+Esta salida confirma que todos los módulos se ejecutan secuencialmente sin errores, validando la correcta implementación del programa. Los resultados detallados se exportan automáticamente al archivo \texttt{output\_resultados.txt}.
 
 \newpage
 \section{Desarrollo de los Apartados del Enunciado}
@@ -407,6 +432,28 @@ Se implementó un modelo MEF con 2 GDL por nodo ($u_x$, $u_y$), resultando en un
 \begin{equation}
 \mathbf{d}_d = \mathbf{S}_{dd}^{-1} (\mathbf{p}_d - \mathbf{S}_{dp} \mathbf{d}_p)
 \end{equation}
+
+\textbf{Resultados de desplazamientos nodales (nodos de la banda de rodadura):}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}cccc@{}}
+\toprule
+Nodo & $u_x$ [m] & $u_y$ [m] & $|u_y|$ [mm] \\
+\midrule
+1 & $0$ & $0$ & $0$ \\
+2 & $0$ & $0$ & $0$ \\
+3 & $-2.43\times10^{-5}$ & $-8.69\times10^{-3}$ & $8.69$ \\
+4 & $-3.61\times10^{-5}$ & $-1.15\times10^{-2}$ & $11.50$ \\
+5 & $-4.14\times10^{-5}$ & $-1.31\times10^{-2}$ & $13.06$ \\
+6 & $-3.61\times10^{-5}$ & $-1.15\times10^{-2}$ & $11.50$ \\
+7 & $-2.43\times10^{-5}$ & $-8.69\times10^{-3}$ & $8.69$ \\
+8 & $0$ & $0$ & $0$ \\
+9 & $0$ & $0$ & $0$ \\
+\bottomrule
+\end{tabular}
+\caption{Desplazamientos nodales en la banda de rodadura -- Nudos biarticulados}
+\end{table}
 
 \textbf{Resultados principales:}
 \begin{itemize}
@@ -450,6 +497,25 @@ La \textcolor{blue}{\underline{Figura \ref{fig:deformada_biarticulado}}} muestra
 \end{itemize}
 
 \subsection{Apartado f) Identificación de Barra Crítica y Verificación de Fallo}
+
+\textbf{Barras con mayores tensiones (top 5):}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}ccc@{}}
+\toprule
+Barra & Tensión [MPa] & Estado \\
+\midrule
+48 & $-55.62$ & Compresión \\
+49 & $-55.62$ & Compresión \\
+44 & $-46.41$ & Compresión \\
+45 & $-46.41$ & Compresión \\
+40 & $-28.08$ & Compresión \\
+\bottomrule
+\end{tabular}
+\caption{Barras con mayores tensiones -- Nudos biarticulados}
+\end{table}
+
 \textbf{Barra con mayor tensión:} Barra 48 con $\sigma = -55.62$ MPa (compresión)
 
 \textbf{Verificación de fallo:}
@@ -460,6 +526,28 @@ La \textcolor{blue}{\underline{Figura \ref{fig:deformada_biarticulado}}} muestra
 \end{itemize}
 
 \subsection{Apartado g) Cálculo de Desplazamientos y Comparación}
+
+\textbf{Resultados de desplazamientos nodales (nodos de la banda de rodadura) -- Nudos rígidos:}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+Nodo & $u_x$ [m] & $u_y$ [m] & $\theta$ [rad] & $|u_y|$ [mm] \\
+\midrule
+1 & $0$ & $0$ & $0$ & $0$ \\
+2 & $0$ & $0$ & $0$ & $0$ \\
+3 & $-2.43\times10^{-5}$ & $-8.67\times10^{-3}$ & $-1.2\times10^{-4}$ & $8.67$ \\
+4 & $-3.60\times10^{-5}$ & $-1.15\times10^{-2}$ & $-1.5\times10^{-4}$ & $11.47$ \\
+5 & $-4.13\times10^{-5}$ & $-1.30\times10^{-2}$ & $-1.6\times10^{-4}$ & $13.02$ \\
+6 & $-3.60\times10^{-5}$ & $-1.15\times10^{-2}$ & $-1.5\times10^{-4}$ & $11.47$ \\
+7 & $-2.43\times10^{-5}$ & $-8.67\times10^{-3}$ & $-1.2\times10^{-4}$ & $8.67$ \\
+8 & $0$ & $0$ & $0$ & $0$ \\
+9 & $0$ & $0$ & $0$ & $0$ \\
+\bottomrule
+\end{tabular}
+\caption{Desplazamientos nodales en la banda de rodadura -- Nudos rígidos}
+\end{table}
 
 \textbf{Resultados:}
 \begin{itemize}
@@ -520,6 +608,25 @@ La \textcolor{blue}{\underline{Figura \ref{fig:deformada_rigido}}} muestra:
 \end{itemize}
 
 \subsection{Apartado j) Identificación de Barra Crítica y Verificación de Fallo}
+
+\textbf{Barras con mayores tensiones (top 5) -- Nudos rígidos:}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}ccc@{}}
+\toprule
+Barra & Tensión [MPa] & Estado \\
+\midrule
+48 & $-55.04$ & Compresión \\
+49 & $-55.04$ & Compresión \\
+44 & $-45.93$ & Compresión \\
+45 & $-45.93$ & Compresión \\
+40 & $-27.79$ & Compresión \\
+\bottomrule
+\end{tabular}
+\caption{Barras con mayores tensiones -- Nudos rígidos}
+\end{table}
+
 \textbf{Barra con mayor tensión:} Barra 48 con $\sigma_{total} = -55.04$ MPa (compresión)
 
 \textbf{Verificación de fallo:}
