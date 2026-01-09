@@ -80,12 +80,12 @@ El objetivo es comparar ambos modelos evaluando desplazamientos, tensiones y rea
 
 \subsection{Geometría de la Estructura}
 
-La estructura analizada consiste en una cercha reticulada plana compuesta por: 
+La estructura analizada consiste en una celosía plana compuesta por: 
 
 \begin{itemize}
     \item \textbf{24 nodos}
     \item \textbf{51 barras}
-    \item \textbf{4 apoyos fijos} ubicados en los nodos 1, 2, 8 y 9 (base de la estructura)
+    \item \textbf{4 apoyos fijos} ubicados en los nodos 1, 2, 8 y 9
     \item \textbf{Longitud total: } \SI{50}{m}
     \item \textbf{Altura total:} \SI{5}{m}
 \end{itemize}
@@ -222,6 +222,7 @@ La tensión axial en cada barra se calcula como:
 
 donde $\Delta L$ es el alargamiento o acortamiento del elemento.
 
+\newpage
 \subsection{Modelo de Nudos Rígidos}
 
 En este modelo, cada nodo tiene 3 grados de libertad ($u_x$, $u_y$, $\theta$):
@@ -325,10 +326,9 @@ El preprocesamiento realiza las siguientes tareas:
     \item Ensamblaje de la matriz de rigidez global del sistema
     \item Visualización gráfica de la estructura
 \end{enumerate}
+Además, almacena los datos y variables en un archivo *.mat para su uso posterior en los módulos "processor" y "postprocessor".
 
 \subsection{Módulo de Procesamiento}
-
-Este módulo resuelve el sistema de ecuaciones: 
 
 \begin{enumerate}
     \item Ensamblaje del vector de fuerzas nodales
@@ -344,7 +344,7 @@ Este módulo resuelve el sistema de ecuaciones:
 El postprocesamiento genera: 
 
 \begin{enumerate}
-    \item Visualización de la estructura deformada con escala amplificada
+    \item Visualización de la estructura deformada con escala aumentada
     \item Mapa de colores representando la distribución de tensiones
     \item Identificación visual de barras fallidas
 \end{enumerate}
@@ -361,28 +361,25 @@ Lectura de input completada
 Matriz de rigidez global (S): ...
 
 --- Paso 3: Procesamiento ---
-========================================
-    RESULTADOS - NUDOS ***
-========================================
+============================================
+    RESULTADOS - NUDOS BIARTICULADOS/RIGIDOS
+============================================
 --- Desplazamientos nodales (d) ---
 ...
 --- Reacciones en los Apoyos ---
 ...
-
 --- Paso 4: Postprocesamiento ---
 
 --- Simulacion completada correctamente ---
 Resultados guardados en: output_***.txt
 \end{lstlisting}
 
-Esta salida confirma que todos los módulos se ejecutan secuencialmente sin errores, validando la correcta implementación del programa. Los resultados detallados se exportan automáticamente al archivo \texttt{output\_***.txt}.
-
 \newpage
-\section{Desarrollo de los Apartados del Enunciado}
+\section{Respuestas a los Apartados del Enunciado}
 
 \subsection{Apartados a) y b): Representación e Identificación de la Estructura}
 
-La estructura analizada es una cercha reticulada plana con:
+La estructura analizada es una celosía plana con:
 \begin{itemize}
     \item 24 nodos
     \item 51 barras (3 tipos según sección transversal)
@@ -431,7 +428,7 @@ Nodo & $u_x$ [m] & $u_y$ [m]\\
 24 & $-2.41\times10^{-3}$ & $-1.20\times10^{-3}$\\
 \bottomrule
 \end{tabular}
-\caption{Desplazamientos nodales (24 nodos) -- Nudos biarticulados}
+\caption{Desplazamientos nodales -- Nudos biarticulados}
 \end{table}
 
 \newpage
@@ -464,7 +461,7 @@ Nodo & $R_x$ [N] & $R_y$ [N] \\
 
 La \textcolor{blue}{\underline{Figura \ref{fig:deformada_biarticulado}}} muestra:
 \begin{itemize}
-    \item Estructura deformada con escala amplificada para visualización
+    \item Estructura deformada con escala aumentada para visualización
     \item Escala de colores representando la tensión axial en cada barra
     \item Barras en compresión (azul) y tracción (rojo)
 \end{itemize}
@@ -483,7 +480,7 @@ Barra & Tensión [MPa] & Estado \\
 49 & $-55.62$ & Compresión \\
 \bottomrule
 \end{tabular}
-\caption{Barras con mayores tensiones -- Nudos biarticulados}
+\caption{Barra con mayor tensión -- Nudos biarticulados}
 \end{table}
 
 \textbf{Barra con mayor tensión:} Barra 48 con $\sigma = -55.62$ MPa (compresión)
@@ -492,9 +489,11 @@ Barra & Tensión [MPa] & Estado \\
 \begin{itemize}
     \item Límite elástico del material: $\sigma_y = 250$ MPa
     \item $|\sigma_{max}| = 55.62$ MPa $< 250$ MPa \quad \checkmark
-    \item \textbf{Conclusión:} Ninguna barra falla
 \end{itemize}
 
+\textbf{Conclusión:} Ninguna barra falla
+
+\newpage
 \subsection{Apartado g) Cálculo de Desplazamientos y Comparación}
 \textbf{Comparación de desplazamientos ($u_x$, $u_y$) entre ambos modelos:}
 
@@ -569,7 +568,7 @@ Nodo & $u_x$ [m] & $u_y$ [m]\\
 \bottomrule
 \end{tabular}
 \end{minipage}
-\caption{Comparación de desplazamientos (24 nodos) entre nudos biarticulados y nudos rígidos}
+\caption{Comparación de desplazamientos entre nudos biarticulados y nudos rígidos}
 \end{table}
 
 Los desplazamientos son muy similares en ambos modelos (diferencias $<$ 0.4\% en $u_y$). El modelo de nudos rígidos presenta rotaciones ($\theta$) del orden de $10^{-4}$ rad. La diferencia marginal confirma que el comportamiento está dominado por esfuerzos axiales.
@@ -615,16 +614,16 @@ La \textcolor{blue}{\underline{Figura \ref{fig:deformada_rigido}}} muestra:
 \textbf{Barras con mayores tensiones -- Nudos rígidos:}
 
 \begin{table}[ht]
-\centering
-\begin{tabular}{@{}ccc@{}}
-\toprule
-Barra & Tensión [MPa] & Estado \\
-\midrule
-48 & $-55.04$ & Compresión \\
-49 & $-55.04$ & Compresión \\
-\bottomrule
-\end{tabular}
-\caption{Barras con mayores tensiones -- Nudos rígidos}
+	\centering
+		\begin{tabular}{@{}ccc@{}}
+			\toprule
+				Barra & Tensión [MPa] & Estado \\
+			\midrule
+				48 & $-55.04$ & Compresión \\
+				49 & $-55.04$ & Compresión \\
+			\bottomrule
+		\end{tabular}
+	\caption{Barra con mayor tensión -- Nudos rígidos}
 \end{table}
 
 \textbf{Barra con mayor tensión:} Barra 48 con $\sigma_{total} = -55.04$ MPa (compresión)
@@ -632,9 +631,9 @@ Barra & Tensión [MPa] & Estado \\
 \textbf{Verificación de fallo:}
 \begin{itemize}
     \item $|\sigma_{max}| = 55.04$ MPa $< 250$ MPa \quad \checkmark
-    \item \textbf{Conclusión:} Ninguna barra falla
-    \item La misma barra crítica que en el modelo biarticulado
 \end{itemize}
+
+\textbf{Conclusión:} Ninguna barra falla. La misma barra que en el modelo biarticulado
 
 \newpage
 \section{Figuras de Resultados}
@@ -644,7 +643,7 @@ Barra & Tensión [MPa] & Estado \\
 \begin{figure}[htpb]
     \centering
     \includegraphics[width=0.75\linewidth]{\detokenize{Nudos biarticulados/figuras/estructura.png}}
-    \caption{Representación gráfica de la estructura con nudos biarticulados. Los colores indican los tres tipos de sección transversal diferentes.}
+    \caption{Representación gráfica de la estructura con nudos biarticulados. Los colores indican los tres tipos distintos de barras.}
     \label{fig:estructura_biarticulado}
 \end{figure}
 
@@ -653,7 +652,7 @@ Barra & Tensión [MPa] & Estado \\
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\linewidth]{\detokenize{Nudos biarticulados/figuras/deformada.png}}
-    \caption{Estructura deformada con escala de colores para tensión axial -- Nudos biarticulados. Las barras en azul están a compresión y en rojo a tracción.}
+    \caption{Estructura deformada con escala de colores para tensión axial -- Nudos biarticulados. Las barras en azul representan compresión y en rojo tracción.}
     \label{fig:deformada_biarticulado}
 \end{figure}
 
@@ -663,7 +662,7 @@ Barra & Tensión [MPa] & Estado \\
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\linewidth]{\detokenize{Nudos Rígidos/figuras/estructura.png}}
-    \caption{Representación gráfica de la estructura con nudos rígidos. Identificación completa de nodos y elementos.}
+    \caption{Representación gráfica de la estructura con nudos rígidos.}
     \label{fig:estructura_rigido}
 \end{figure}
 
@@ -680,11 +679,11 @@ Barra & Tensión [MPa] & Estado \\
 \section{Conclusiones}
 
 \begin{enumerate}
-    \item Se ha desarrollado exitosamente un programa modular en MATLAB para el análisis de estructuras reticuladas planas mediante MEF, implementando dos modelos: nudos biarticulados y nudos rígidos.
+    \item Se ha desarrollado un programa modular en MATLAB para el análisis de estructuras/celosías planas usando elementos finitos, aplicado a dos modelos: nodos biarticulados y nodos rígidos.
     
     \item Ambos modelos proporcionan resultados muy similares (diferencia $< 1\%$), confirmando que el comportamiento está dominado por esfuerzos axiales para este tipo de estructura.
     
-    \item El modelo biarticulado es suficientemente preciso con ventaja computacional (1/3 menos GDLs).
+    \item El modelo biarticulado es suficientemente preciso con ventaja computacional (1 GDL menos por cada nodo, de 3 a 2).
     
     \item La estructura es segura bajo las cargas especificadas: tensión máxima representa solo el $\approx25\%$ del límite elástico.
     
